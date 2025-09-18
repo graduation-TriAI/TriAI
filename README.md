@@ -3,7 +3,7 @@
 
 ### 연구 주제
 - 대주제: [멀티모달 엣지 AI] 각각 다른 모달리티 데이터를 갖는 클라이언트들간의 Model 차원에서의 Translation을 통한 연합 학습(Federated Learning) 연구
-- 소주제: 지진 동향 분석을 위해 엣지 환경에서 연합 학습을 활용하고, 멀티모달 데이터를 Universal Modality-Indepdent Space로 통합 처리하는 AI 시스템 개발 연구
+- 소주제: 지진 동향 분석을 위해 엣지 환경에서 연합 학습을 활용하고, 멀티모달 데이터를 Universal Modality-Independent Space로 통합 처리하는 AI 시스템 개발 연구
 
 ### 연구 소개
 이 연구는 서로 다른 모달리티를 가지는 지진 데이터들에 대해 연합 학습 및 Universal Modality-Independent Space 학습으로 **지진 동향을 분석하고**  **지진 발생 예측 및 피해 추정 시스템**을 고도화하는 것을 목표로 함
