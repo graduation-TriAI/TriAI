@@ -2,7 +2,7 @@
 
 모달리티 간 변환을 넘어선 특정 모달리티 - Universal Modality-Independent Space 학습을 통한 모델의 확장성 확보
 
-### 소주제: 지진 동향 분석을 위해 엣지 환경에서 연합 학습을 활용하고, 멀티모달 데이터를 Universal Modality-Indepdent Space로 통합 처리하는 AI 시스템 개발 연구
+### 소주제: 지진 동향 분석을 위해 엣지 환경에서 연합 학습을 활용하고, 멀티모달 데이터를 Universal Modality-Independent Space로 통합 처리하는 AI 시스템 개발 연구
 
 - Key word 3개: UMIS, 연합학습, 지진 동향 분석
 - 누구를 위해: 지진 대응 기관(기상청, 지질조사기관, 재난안전본부 등)과 지역 주민, 나아가 재난 관리 정책 결정자들을 위해
