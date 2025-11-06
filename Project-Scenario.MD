@@ -1,7 +1,7 @@
 |항목|내용|
 |---|---|
 |프로젝트명|  특정 지역의 지진 발생 가능성 예측을 위해 각 관측소에서 서로 다른 모달리티의 데이터를 수집하고, 이를 Universal Modality-Independent Space로 투영한 후 연합학습을 수행하는 AI 시스템 개발 연구  |
-|프로젝트 키워드|  멀티모달, 엣지AI, 연합 학습, UMIS, 지진 동향 분석  |
+|프로젝트 키워드|  멀티모달, 엣지AI, 연합 학습, UMIS, 지진 발생 가능성 예측  |
 |트랙|  연구  |
 |프로젝트 멤버|  조혜림, 김민, 박소영  |
 |팀지도교수|  이형준 교수님  |
@@ -11,4 +11,4 @@
 |사용할 소프트웨어 패키지의 명칭과 핵심기능/용도| - **연합 학습 프레임워크**: Flower 등 <br> º 핵심 기능/용도: 분산된 엣지 디바이스 간의 모델 학습을 효율적으로 조율합니다. <br> - **딥러닝 프레임워크**: PyTorch, Hugging Face Transformer 등 <br> º 핵심 기능/용도: 딥러닝 프레임워크; 멀티모달 AI 모델의 신경망을 설계하고 학습시키는 데 사용합니다. <br> - **데이터 전처리**: Pandas, NumPy, Scipy 등 <br> º 핵심 기능/용도: 다차원 배열 연산 및 신호 처리, 푸리에 변환 등 과학 기술 계산과 데이터 전처리를 위한 라이브러리로 사용합니다. <br> - **시각화**: Matplotlib, Grafana, Seaborn, Plotly 등 <br> º 핵심 기능/용도: 분석 결과 및 지도, 모델의 성능 변화 등을 그래프 등의 형태로 시각화하는 데 사용합니다.  |
 |사용할 소프트웨어 패키지의 명칭과 URL|  - **연합 학습 프레임워크** <br> º Flower: https://flower.ai/ <br> - **딥러닝 프레임워크** <br> º PyTorch: https://pytorch.org/ <br> º Hugging Face Transformer: https://huggingface.co/docs/transformers/index <br> - **데이터 전처리** <br> º Pandas: https://pandas.pydata.org/ <br> º NumPy: https://numpy.org/ <br> º Scipy: https://scipy.org/ <br> - **시각화** <br> º Matplotlib: https://matplotlib.org/ <br> º Grafana: https://grafana.com/ <br> º Seaborn: https://seaborn.pydata.org/ <br> º Plotly:  https://plotly.com/python/  |
 |팀그라운드룰|  https://github.com/graduation-TriAI/TriAI/blob/main/GroundRule.md  |
-|최종수정일|  2025/10/13  |
+|최종수정일|  2025/11/06  |
