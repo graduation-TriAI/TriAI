@@ -2,8 +2,7 @@
 이화여자대학교 컴퓨터공학과 졸업프로젝트 연구 트랙 26팀 TriAI
 
 ### 연구 주제
-- 대주제: [멀티모달 엣지 AI] 각각 다른 모달리티 데이터를 갖는 클라이언트들간의 Model 차원에서의 Translation을 통한 연합 학습(Federated Learning) 연구
-- 소주제: 지진 동향 분석을 위해 엣지 환경에서 연합 학습을 활용하고, 멀티모달 데이터를 Universal Modality-Independent Space로 통합 처리하는 AI 시스템 개발 연구
+특정 지역의 지진 발생 가능성 예측을 위해 각 관측소에서 서로 다른 모달리티의 데이터를 수집하고, 이를 Universal Modality-Independent Space로 투영한 후 연합학습을 수행하는 AI 시스템 개발 연구
 
 ### 연구 소개
 이 연구는 서로 다른 모달리티를 가지는 지진 데이터들에 대해 연합 학습 및 Universal Modality-Independent Space 학습으로 높은 정확도로 **지진 발생 가능성을 예측**하여  **지진 피해 최소화**를 목표로 함
