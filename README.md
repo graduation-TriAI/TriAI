@@ -168,4 +168,4 @@
 
 # 팀 그라운드 룰
 
-[GroundRule.md](http://groundrule.md/)
+[GroundRule.md](https://github.com/graduation-TriAI/TriAI/blob/main/GroundRule.md)
