@@ -1,0 +1,18 @@
+#Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+#Virtual environment
+.venv/
+venv/
+
+#Data folders (large files)
+data/*
+
+#Keep documentation files
+!data/raw/README_DATA.md
+
+#OS files
+.DS_Store
+Thumbs.db
