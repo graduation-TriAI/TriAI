@@ -60,29 +60,28 @@
 
 ```markdown
 .
-└── 스타트
-    ├── 데이터
-    │   ├── gl.csv
-    │   ├── gl_df.csv
-    │   ├── label.csv
-    │   ├── gw_scaler.pkl
-    │   ├── gru_dataset.npz
-    │   ├── merged_seismic_data.h5
-    │   ├── EQT_Training_Dataset.h5
-    │   └── EQT_Multitask_Dataset.h5
-    ├── 데이터 전처리
-    │   ├── 지진 목록 데이터.xls
-    │   ├── 지하수 데이터 수집.ipynb
-    │   ├── 지진파 데이터 크롤링.ipynb
-    │   └── 데이터 전처리.ipynb
-    └── 실험
-        ├── 로컬학습
-        │   ├── 1D_CNN.ipynb
-        │   ├── EQTransformer.ipynb
-        │   └── smallGRU.ipynb
-        └── 연합학습
-            ├── FL_freeze.ipynb
-            └── FL_freeze_unfreeze.ipynb
+├── 데이터
+│   ├── gl.csv
+│   ├── gl_df.csv
+│   ├── label.csv
+│   ├── gw_scaler.pkl
+│   ├── gru_dataset.npz
+│   ├── merged_seismic_data.h5
+│   ├── EQT_Training_Dataset.h5
+│   └── EQT_Multitask_Dataset.h5
+├── 데이터 전처리
+│   ├── 지진 목록 데이터.xls
+│   ├── 지하수 데이터 수집.ipynb
+│   ├── 지진파 데이터 크롤링.ipynb
+│   └── 데이터 전처리.ipynb
+└── 실험
+    ├── 로컬학습
+    │   ├── 1D_CNN.ipynb
+    │   ├── EQTransformer.ipynb
+    │   └── smallGRU.ipynb
+    └── 연합학습
+        ├── FL_freeze.ipynb
+        └── FL_freeze_unfreeze.ipynb
 ```
 
 ## 실험 방법
