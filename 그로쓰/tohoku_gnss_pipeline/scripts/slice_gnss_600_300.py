@@ -11,7 +11,7 @@ import re
 import pandas as pd
 import numpy as np
 
-STATION_LIST = CSV_DIR / "stations_within_300km.csv"
+STATION_LIST = CSV_DIR / "stations_tohoku_bbox.csv"
 NPZ_DIR.mkdir(parents=True, exist_ok=True)
 
 WIN = 600

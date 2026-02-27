@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 from scripts.common import SAMP_DIR, NPZ_DIR
 
-NPZ_FILE = NPZ_DIR / "GNET0027_600s_300s.npz"
-OUT_CSV = SAMP_DIR / "GNET0027_window_sample.csv"
+NPZ_FILE = NPZ_DIR / "GNET0023_600s_300s.npz"
+OUT_CSV = SAMP_DIR / "GNET0023_window_sample.csv"
 
 data = np.load(NPZ_FILE)
 

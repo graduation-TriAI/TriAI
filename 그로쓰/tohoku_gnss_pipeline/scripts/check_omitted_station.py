@@ -1,6 +1,6 @@
 
 """
-Compare stations withing 300km against generated GNSS window files
+Compare stations within Tohoku region against generated GNSS window files
 and export the list of missing stations.
 """
 
@@ -8,8 +8,8 @@ from scripts.common import CSV_DIR, NPZ_DIR
 import re
 import pandas as pd
 
-IN_300KM_CSV = CSV_DIR / "stations_within_300km.csv"
-OUT_MISSING_CSV = CSV_DIR / "missing_stations_300km_vs_windows.csv"
+IN_300KM_CSV = CSV_DIR / "stations_tohoku_bbox.csv"
+OUT_MISSING_CSV = CSV_DIR / "missing_stations_tohoku_vs_windows.csv"
 
 #Extract station ID (e.g., GNET0001) from filename
 ST_RE = re.compile(r"(GNET\d{4})", re.I)

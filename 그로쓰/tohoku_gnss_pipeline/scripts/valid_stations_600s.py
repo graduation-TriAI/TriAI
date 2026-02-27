@@ -8,7 +8,7 @@ from scripts.common import CSV_DIR, NPZ_DIR
 import re
 import pandas as pd
 
-OUT = CSV_DIR / "stations_300km_valid_600s.csv"
+OUT = CSV_DIR / "stations_tohoku_valid_600s.csv"
 
 #Extract station ID (e.g., GNET0001) from filename
 ST_RE = re.compile(r"(GNET\d{4})", re.I)
