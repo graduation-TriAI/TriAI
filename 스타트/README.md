@@ -60,10 +60,6 @@
 
 ```markdown
 .
-├── README.md
-├── GroundRule.md
-├── Ideation.md
-├── Project-Scenario.md
 └── 스타트
     ├── 데이터
     │   ├── gl.csv
