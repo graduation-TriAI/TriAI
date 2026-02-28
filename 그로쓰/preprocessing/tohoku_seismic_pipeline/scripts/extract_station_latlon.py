@@ -1,17 +1,34 @@
-from pathlib import Path
+
+"""
+Extract unique seismic station coordinates from a metadata text file.
+
+This script parses a channel metadata table (text format),
+extracts station codes with their latitude and longitude,
+and saves the unique stations to a CSV file.
+"""
+
+from scripts.common import TXT_DIR, CSV_DIR
 import csv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-TXT_PATH = BASE_DIR / "data" / "txt"
-CSV_PATH = BASE_DIR / "data" / "csv"
-IN_PATH = TXT_PATH / "seismic_station_metadata.txt"
-OUT_PATH = CSV_PATH / "stations_latlon.csv"
+IN_PATH = TXT_DIR / "seismic_station_metadata.txt"
+OUT_PATH = CSV_DIR / "stations_latlon.csv"
 
 def parse_channels_table_line(line: str):
+    """
+    Parse a single line of the channel metadata table.
+
+    Expected format (based on README specification):
+        [4]  station code
+        [14] latitude
+        [15] longitude
+
+    Returns:
+        (station_code, lat, lon) if valid,
+        None if the line does not match the expected format.
+    """
     parts = line.strip().split()
     if len(parts) < 15:
-        return None  # 최소한 lon(15번째)까지는 있어야 함
+        return None 
 
     station_code = parts[3]          # [4]
     lat = float(parts[13])           # [14]
@@ -20,7 +37,7 @@ def parse_channels_table_line(line: str):
     return station_code, lat, lon
 
 
-stations = {}  # station_code -> (lat, lon)
+stations = {}  
 
 with IN_PATH.open("r", encoding="utf-8", errors="replace") as f:
     for raw in f:

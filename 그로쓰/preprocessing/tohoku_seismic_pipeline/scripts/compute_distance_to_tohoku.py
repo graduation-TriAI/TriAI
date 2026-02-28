@@ -4,15 +4,12 @@ Compute great-circle distances(km) from the 2011 Tohoku earthquake epicenter
 to each seismic station, then sort stations by distance and save the result.
 """
 
-from pathlib import Path
+from scripts.common import CSV_DIR
 import pandas as pd
 import numpy as np
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-CSV_PATH = BASE_DIR / "data" / "csv"
-
-INPUT_CSV = CSV_PATH / "stations_latlon.csv"
-OUTPUT_CSV = CSV_PATH / "seismic_stations_sorted_by_distance.csv"
+INPUT_CSV = CSV_DIR / "stations_latlon.csv"
+OUTPUT_CSV = CSV_DIR / "seismic_stations_sorted_by_distance.csv"
 
 #Epicenter coordinates (lat, lon) for the 2011 Tohoku earthquake
 TOHOKU_LAT = 38.297
