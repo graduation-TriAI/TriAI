@@ -27,8 +27,8 @@ Accessed on: 2026-02-19.
 data/
   raw/        # original downloaded data (not tracked in Git)
   npz/        # generated windowed GNSS data (not tracked in Git)
-  csv/        # processed summary CSV files
-  sample/     # small example outputs
+  csv/        # processed summary CSV files (not tracked in Git)
+  sample/     # small example outputs (not tracked in Git)
 
 scripts/      # main preprocessing scripts
 tools/        # utility / helper scripts
