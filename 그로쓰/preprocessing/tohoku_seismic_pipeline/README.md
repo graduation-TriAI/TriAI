@@ -10,7 +10,14 @@ The pipeline includes:
 
 ## Data Source
 
+Seismic station metadata and waveform data were obtained from:
 
+National Research Institute for Earth Science and Disaster Resilience (NIED).  
+Hi-net (High Sensitivity Seismograph Network Japan),  
+2011 Tohoku earthquake records.  
+https://www.hinet.bosai.go.jp/
+
+Accessed: 2026-02-24.
 
 ## Project Structure
 ```
