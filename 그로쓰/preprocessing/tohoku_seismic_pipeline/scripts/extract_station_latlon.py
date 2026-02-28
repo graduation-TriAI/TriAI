@@ -7,10 +7,10 @@ extracts station codes with their latitude and longitude,
 and saves the unique stations to a CSV file.
 """
 
-from scripts.common import TXT_DIR, CSV_DIR
+from scripts.common import RAW_DIR, CSV_DIR
 import csv
 
-IN_PATH = TXT_DIR / "seismic_station_metadata.txt"
+IN_PATH = RAW_DIR / "seismic_station_metadata.txt"
 OUT_PATH = CSV_DIR / "stations_latlon.csv"
 
 def parse_channels_table_line(line: str):
