@@ -176,14 +176,18 @@ if __name__ == "__main__":
             data = np.load(fp)
 
             X = data["X"]              # (N,600,3)
-            starts = data.get("start") # (N,)  
+            start_sec = data.get("start_sec")
+            fs = data.get("fs") 
 
             print("Input shape :", X.shape)
 
-            if starts is not None:
-                print("Start indices (first 5):", starts[:5])
+            if start_sec is not None:
+                print("Start times (sec, first 5):", start_sec[:5])
             else:
-                print("No 'start' metadata found.")
+                print("No 'start_sec' metadata found.")
+
+            if fs is not None:
+                print("Sampling rate:", fs.item(), "Hz")
 
             x = torch.from_numpy(X).float()
 

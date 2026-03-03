@@ -16,6 +16,7 @@ GNSS_NPZ_DIR.mkdir(parents=True, exist_ok=True)
 
 WIN = 600
 STRIDE = 300
+FS = 1.0  # Hz (sampling rate)
 
 STATION_RE = re.compile(r"(GNET\d{4})", re.I)
 
@@ -43,13 +44,22 @@ def load_gnss_tab(fp: Path) -> pd.DataFrame:
     return df
 
 
-def slice_windows(arr: np.ndarray, win: int, stride: int) -> np.ndarray:
-    """Slice (T,C) array into (N, win, C) windows using a fixed stride."""
+def slice_windows(arr: np.ndarray, win: int, stride: int, fs: float):
+    """
+    Slice (T,C) array into:
+      - windows: (N, win, C)
+      - start_sec: (N,) window start time in seconds (relative to series start)
+    """
     n = len(arr)
     if n < win:
-        return np.empty((0, win, arr.shape[1]), dtype=arr.dtype)
-    starts = range(0, n - win + 1, stride)
-    return np.stack([arr[s:s+win] for s in starts], axis=0)
+        empty_w = np.empty((0, win, arr.shape[1]), dtype=arr.dtype)
+        empty_s = np.empty((0,), dtype=np.float32)
+        return empty_w, empty_s
+
+    start_idx = np.arange(0, n - win + 1, stride, dtype=np.int64)
+    windows = np.stack([arr[s:s + win] for s in start_idx], axis=0)
+    start_sec = (start_idx / fs).astype(np.float32)  
+    return windows, start_sec
 
 
 total_windows = 0
@@ -105,13 +115,18 @@ for tab_file in sorted(GNSS_DATASET_DIR.glob("*.tab")):
     data = df[[east_col, north_col, up_col]].apply(pd.to_numeric, errors="coerce").dropna().to_numpy()
     # data shape: (T,3)
 
-    windows = slice_windows(data, WIN, STRIDE)
+    windows, start_sec = slice_windows(data, WIN, STRIDE, FS)
     if windows.shape[0] == 0:
         skipped_small += 1
         continue
 
     out_path = GNSS_NPZ_DIR / f"{station}_600s_300s.npz"
-    np.savez_compressed(out_path, X=windows)
+    np.savez_compressed(
+    out_path,
+    X=windows.astype(np.float32),
+    start_sec=start_sec,                 # (N,)
+    fs=np.array([FS], dtype=np.float32)  # (1,)
+)
 
     total_windows += windows.shape[0]
     processed += 1
