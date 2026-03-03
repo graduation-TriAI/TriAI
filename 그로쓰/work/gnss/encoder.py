@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from shared.paths import GNSS_NPZ_DIR
+import numpy as np
 
 class ResBlock1D(nn.Module):
     def __init__(self, in_ch, out_ch, k=7, dropout=0.0):
@@ -8,7 +10,7 @@ class ResBlock1D(nn.Module):
         pad = k // 2
         self.conv1 = nn.Conv1d(in_ch, out_ch, k, padding=pad, bias=False)
         self.bn1 = nn.BatchNorm1d(out_ch)
-        self.conv2 = nn.nn.Conv1d(out_ch, out_ch, k, padding=pad, bias=False)
+        self.conv2 = nn.Conv1d(out_ch, out_ch, k, padding=pad, bias=False)
         self.bn2 = nn.BatchNorm1d(out_ch)
         self.drop = nn.Dropout(dropout) if dropout and dropout > 0 else nn.Identity()
 
@@ -36,7 +38,7 @@ class TransformerBlock(nn.Module):
 
         self.ffn = nn.Sequential(
             nn.Linear(d_model, d_model * ff_mult),
-            nn.Relu(),
+            nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(d_model * ff_mult, d_model),
         )
@@ -88,7 +90,7 @@ class GNSSFeatMapEncoder(nn.Module):
         self.stem = nn.Sequential(
             nn.Conv1d(in_ch, base_filters, k, padding=k//2, bias=False),
             nn.BatchNorm1d(base_filters),
-            nn.Relu(),
+            nn.ReLU(),
         )
         self.res = nn.Sequential(*[
             ResBlock1D(base_filters, base_filters, k=k, dropout=dropout)
@@ -119,7 +121,7 @@ class GNSSFeatMapEncoder(nn.Module):
 
         self.align = nn.Sequential(
             nn.Conv1d(2 * lstm_units, base_filters, 1, bias=True),
-            nn.Relu(),
+            nn.ReLU(),
         )
 
         self.tx = TransformerBlock(
@@ -153,12 +155,7 @@ class GNSSFeatMapEncoder(nn.Module):
         return self.tx(x, return_attn=False)
     
 if __name__ == "__main__":
-    import numpy as np
-    import torch
-    from shared.paths import GNSS_NPZ_DIR
-
-    # ==== 경로 설정 ====
-    npz_dir = GNSS_NPZ_DIR   # 실제 경로로 바꿔줘!
+    npz_dir = GNSS_NPZ_DIR   
 
     # ==== 인코더 생성 ====
     enc = GNSSFeatMapEncoder(downsample="none")
@@ -179,7 +176,7 @@ if __name__ == "__main__":
             data = np.load(fp)
 
             X = data["X"]              # (N,600,3)
-            starts = data.get("start") # (N,)  있을 경우
+            starts = data.get("start") # (N,)  
 
             print("Input shape :", X.shape)
 
@@ -188,10 +185,8 @@ if __name__ == "__main__":
             else:
                 print("No 'start' metadata found.")
 
-            # -------- 텐서 변환 --------
             x = torch.from_numpy(X).float()
 
-            # -------- 인코더 통과 --------
             feat = enc(x)
 
             print("Feature shape:", feat.shape)
