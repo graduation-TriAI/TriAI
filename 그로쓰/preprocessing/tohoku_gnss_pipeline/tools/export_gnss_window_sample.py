@@ -6,10 +6,10 @@ for inspection and visualization.
 
 import numpy as np
 import pandas as pd
-from scripts.common import SAMP_DIR, NPZ_DIR
+from shared.paths import GNSS_SAMP_DIR, GNSS_NPZ_DIR
 
-NPZ_FILE = NPZ_DIR / "GNET0023_600s_300s.npz"
-OUT_CSV = SAMP_DIR / "GNET0023_window_sample.csv"
+NPZ_FILE = GNSS_NPZ_DIR / "GNET0023_600s_300s.npz"
+OUT_CSV = GNSS_SAMP_DIR / "GNET0023_window_sample.csv"
 
 data = np.load(NPZ_FILE)
 

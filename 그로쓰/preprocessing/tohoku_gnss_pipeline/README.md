@@ -36,10 +36,12 @@ tools/        # utility / helper scripts
 
 ## How to Run
 
+All commands must be executed from the **그로쓰 (project root)** directory.
+
 Example:
 ```
-python -m scripts.extract_station_lat_lon
-python -m scripts.compute_distance_to_tohoku
-python -m scripts.filter_within_300km
-python -m scripts.slice_gnss_600_300
+python -m preprocessing.tohoku_gnss_pipeline.scripts.extract_station_lat_lon
+python -m preprocessing.tohoku_gnss_pipeline.scripts.compute_distance_to_tohoku
+python -m preprocessing.tohoku_gnss_pipeline.scripts.extract_tohoku_region_stations
+python -m preprocessing.tohoku_gnss_pipeline.scripts.slice_gnss_600_300
 ```

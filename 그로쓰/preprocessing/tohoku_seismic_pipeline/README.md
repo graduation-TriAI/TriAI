@@ -30,8 +30,10 @@ scripts/      # main preprocessing scripts
 
 ## How to Run
 
+All commands must be executed from the **그로쓰 (project root)** directory.
+
 Example:
 ```
-python -m scripts.extract_station_latlon
-python -m scripts.compute_distance_to_tohoku
+python -m preprocessing.tohoku_seismic_pipeline.scripts.extract_station_latlon
+python -m preprocessing.tohoku_seismic_pipeline.scripts.compute_distance_to_tohoku
 ```

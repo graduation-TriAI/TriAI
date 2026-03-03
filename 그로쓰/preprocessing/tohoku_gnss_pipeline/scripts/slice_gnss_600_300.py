@@ -6,13 +6,13 @@ due to insufficient data length or parsing issues.
 """
 
 from pathlib import Path
-from scripts.common import CSV_DIR, NPZ_DIR, DATASET_DIR
+from shared.paths import GNSS_CSV_DIR, GNSS_NPZ_DIR, GNSS_DATASET_DIR
 import re
 import pandas as pd
 import numpy as np
 
-STATION_LIST = CSV_DIR / "stations_tohoku_bbox.csv"
-NPZ_DIR.mkdir(parents=True, exist_ok=True)
+STATION_LIST = GNSS_CSV_DIR / "stations_tohoku_bbox.csv"
+GNSS_NPZ_DIR.mkdir(parents=True, exist_ok=True)
 
 WIN = 600
 STRIDE = 300
@@ -58,7 +58,7 @@ skipped_small = 0
 failed_read = 0
 failed_cols = 0
 
-for tab_file in sorted(DATASET_DIR.glob("*.tab")):
+for tab_file in sorted(GNSS_DATASET_DIR.glob("*.tab")):
     m = STATION_RE.search(tab_file.name)
     if m is None:
         continue
@@ -110,7 +110,7 @@ for tab_file in sorted(DATASET_DIR.glob("*.tab")):
         skipped_small += 1
         continue
 
-    out_path = NPZ_DIR / f"{station}_600s_300s.npz"
+    out_path = GNSS_NPZ_DIR / f"{station}_600s_300s.npz"
     np.savez_compressed(out_path, X=windows)
 
     total_windows += windows.shape[0]
