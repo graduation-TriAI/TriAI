@@ -7,12 +7,10 @@ due to insufficient data length or parsing issues.
 
 from pathlib import Path
 from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
-from shared.config import WIN, STRIDE
+from shared.config import WIN, STRIDE, SAMPLING_RATE
 import re
 import pandas as pd
 import numpy as np
-
-FS = 1.0  # Hz (sampling rate)
 
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 STATION_LIST = CSV_GNSS / "stations_tohoku_bbox.csv"
@@ -115,7 +113,7 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     data = df[[east_col, north_col, up_col]].apply(pd.to_numeric, errors="coerce").dropna().to_numpy()
     # data shape: (T,3)
 
-    windows, start_sec = slice_windows(data, WIN, STRIDE, FS)
+    windows, start_sec = slice_windows(data, WIN, STRIDE, SAMPLING_RATE)
     if windows.shape[0] == 0:
         skipped_small += 1
         continue
@@ -125,7 +123,7 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     out_path,
     X=windows.astype(np.float32),
     start_sec=start_sec,                 # (N,)
-    fs=np.array([FS], dtype=np.float32)  # (1,)
+    fs=np.array([SAMPLING_RATE], dtype=np.float32)  # (1,)
 )
 
     total_windows += windows.shape[0]
