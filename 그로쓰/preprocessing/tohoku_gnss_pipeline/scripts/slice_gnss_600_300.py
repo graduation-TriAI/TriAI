@@ -6,17 +6,18 @@ due to insufficient data length or parsing issues.
 """
 
 from pathlib import Path
-from shared.paths import GNSS_CSV_DIR, GNSS_NPZ_DIR, GNSS_DATASET_DIR
+from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
 import re
 import pandas as pd
 import numpy as np
 
-STATION_LIST = GNSS_CSV_DIR / "stations_tohoku_bbox.csv"
-GNSS_NPZ_DIR.mkdir(parents=True, exist_ok=True)
-
 WIN = 600
 STRIDE = 300
 FS = 1.0  # Hz (sampling rate)
+
+GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
+STATION_LIST = CSV_GNSS / "stations_tohoku_bbox.csv"
+GNSS_NPZ_DIR.mkdir(parents=True, exist_ok=True)
 
 STATION_RE = re.compile(r"(GNET\d{4})", re.I)
 
@@ -68,7 +69,7 @@ skipped_small = 0
 failed_read = 0
 failed_cols = 0
 
-for tab_file in sorted(GNSS_DATASET_DIR.glob("*.tab")):
+for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     m = STATION_RE.search(tab_file.name)
     if m is None:
         continue

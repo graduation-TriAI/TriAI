@@ -4,12 +4,12 @@ Parse GNSS .tab files to extract station ID, latitude, and longitude
 from file headers, then save a station-level summary CSV.
 """
 
-from shared.paths import GNSS_CSV_DIR, GNSS_DATASET_DIR
+from shared.paths import CSV_GNSS, GNSS_TOHOKU_RAW
 from pathlib import Path
 import re
 import pandas as pd
 
-OUT = GNSS_CSV_DIR / "stations_latlon_1221.csv"
+OUT = CSV_GNSS / "stations_latlon_1221.csv"
 
 #Extract station ID like GNET0001 from filename
 ST_RE = re.compile(r"(GNET\d{4})", re.I)
@@ -45,7 +45,7 @@ rows = []
 miss_station = 0
 miss_latlon = 0
 
-for fp in sorted(GNSS_DATASET_DIR.glob("*.tab")):
+for fp in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     st = get_station_id(fp.name)
     if st is None:
         miss_station += 1
@@ -64,7 +64,7 @@ df = pd.DataFrame(rows)
 df.to_csv(OUT, index=False, encoding="utf-8-sig")
 
 print("[OK] saved:", OUT)
-print("files scanned:", len(list(GNSS_DATASET_DIR.glob('*.tab'))))
+print("files scanned:", len(list(GNSS_TOHOKU_RAW.glob('*.tab'))))
 print("rows extracted:", len(df))
 print("unique stations:", df.shape[0])
 print("missing station-id in filename:", miss_station)

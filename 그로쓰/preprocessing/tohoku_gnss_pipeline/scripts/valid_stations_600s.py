@@ -4,11 +4,15 @@ Extract station IDs from generated 600s window NPZ files
 and save the unique station list to CSV.
 """
 
-from shared.paths import GNSS_CSV_DIR, GNSS_NPZ_DIR
+from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC
 import re
 import pandas as pd
 
-OUT = GNSS_CSV_DIR / "stations_tohoku_valid_600s.csv"
+WIN = 600
+STRIDE = 300
+
+GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
+OUT = CSV_GNSS / "stations_tohoku_valid_600s.csv"
 
 #Extract station ID (e.g., GNET0001) from filename
 ST_RE = re.compile(r"(GNET\d{4})", re.I)

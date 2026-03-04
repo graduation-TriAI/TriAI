@@ -6,10 +6,10 @@ Extract stations within the Tohoku region using a rough latitude/longitude bound
 from pathlib import Path
 import re
 import pandas as pd
-from shared.paths import GNSS_CSV_DIR
+from shared.paths import CSV_GNSS
 
-IN_CSV  = GNSS_CSV_DIR / "stations_latlon_1221.csv"
-OUT_CSV = GNSS_CSV_DIR / "stations_tohoku_bbox.csv"
+IN_CSV  = CSV_GNSS / "stations_latlon_1221.csv"
+OUT_CSV = CSV_GNSS / "stations_tohoku_bbox.csv"
 
 # -------------------------
 # Bounding box for Tohoku (approximate)

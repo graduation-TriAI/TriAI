@@ -6,10 +6,14 @@ for inspection and visualization.
 
 import numpy as np
 import pandas as pd
-from shared.paths import GNSS_SAMP_DIR, GNSS_NPZ_DIR
+from shared.paths import CSV_SAMPLES, GNSS_TOHOKU_PROC
 
+WIN = 600
+STRIDE = 300
+
+GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 NPZ_FILE = GNSS_NPZ_DIR / "GNET0023_600s_300s.npz"
-OUT_CSV = GNSS_SAMP_DIR / "GNET0023_window_sample.csv"
+OUT_CSV = CSV_SAMPLES / "GNET0023_window_sample.csv"
 
 data = np.load(NPZ_FILE)
 
