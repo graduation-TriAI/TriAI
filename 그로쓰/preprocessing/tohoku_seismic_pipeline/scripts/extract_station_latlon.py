@@ -7,11 +7,11 @@ extracts station codes with their latitude and longitude,
 and saves the unique stations to a CSV file.
 """
 
-from shared.paths import SEIS_RAW_DIR, SEIS_CSV_DIR
+from shared.paths import SEIS_TOHOKU_RAW, CSV_SEIS
 import csv
 
-IN_PATH = SEIS_RAW_DIR / "seismic_station_metadata.txt"
-OUT_PATH = SEIS_CSV_DIR / "stations_latlon.csv"
+IN_PATH = SEIS_TOHOKU_RAW / "seismic_station_metadata.txt"
+OUT_PATH = CSV_SEIS / "stations_latlon.csv"
 
 def parse_channels_table_line(line: str):
     """
