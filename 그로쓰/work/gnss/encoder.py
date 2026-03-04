@@ -2,10 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from shared.paths import GNSS_TOHOKU_PROC
+from shared.config import WIN, STRIDE
 import numpy as np
-
-WIN = 600
-STRIDE = 300
 
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 
