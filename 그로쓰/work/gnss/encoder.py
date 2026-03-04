@@ -1,8 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from shared.paths import GNSS_NPZ_DIR
+from shared.paths import GNSS_TOHOKU_PROC
 import numpy as np
+
+WIN = 600
+STRIDE = 300
+
+GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 
 class ResBlock1D(nn.Module):
     def __init__(self, in_ch, out_ch, k=7, dropout=0.0):
