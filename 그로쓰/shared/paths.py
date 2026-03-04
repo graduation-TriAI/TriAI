@@ -1,21 +1,37 @@
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[1] #2아닌가?
 
+#top-level folders
+DATA = ROOT / "data"
 PREPROCESSING = ROOT / "preprocessing"
 WORK = ROOT / "work"
 
-TOHOKU_GNSS = PREPROCESSING / "tohoku_gnss_pipeline"
-TOHOKU_SEIS = PREPROCESSING / "tohoku_seismic_pipeline"
+#data base
+RAW = DATA / "raw"
+PROCESSED = DATA / "processed"
+CSV = DATA / "csv"
 
-GNSS_DATA = TOHOKU_GNSS / "data"
-SEIS_DATA = TOHOKU_SEIS / "data"
+#modalities
+RAW_GNSS = RAW / "gnss"
+RAW_SEIS = RAW / "seismic"
 
-GNSS_NPZ_DIR = GNSS_DATA / "npz" / "gnss_windowed_600_300"
-GNSS_CSV_DIR = GNSS_DATA / "csv"
-GNSS_RAW_DIR = GNSS_DATA / "raw"
-GNSS_SAMP_DIR = GNSS_DATA / "sample"
-GNSS_DATASET_DIR = GNSS_RAW_DIR / "datasets"
+PROC_GNSS = PROCESSED / "gnss"
+PROC_SEIS = PROCESSED / "seismic"
 
-SEIS_CSV_DIR = SEIS_DATA / "csv"
-SEIS_RAW_DIR = SEIS_DATA / "raw"
+CSV_GNSS = CSV / "gnss"
+CSV_SEIS = CSV / "seismic"
+CSV_SAMPLES = CSV / "samples"
+
+#events
+TOHOKU = "tohoku"
+
+# ---- GNSS: tohoku ----
+GNSS_TOHOKU_RAW = RAW_GNSS / TOHOKU
+GNSS_TOHOKU_PROC = PROC_GNSS / TOHOKU
+GNSS_TOHOKU_CSV = CSV_GNSS / TOHOKU
+
+# ---- SEISMIC: tohoku ----
+SEIS_TOHOKU_RAW = RAW_SEIS / TOHOKU
+SEIS_TOHOKU_PROC = PROC_SEIS / TOHOKU
+SEIS_TOHOKU_CSV = CSV_SEIS / TOHOKU
