@@ -118,7 +118,7 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
         skipped_small += 1
         continue
 
-    out_path = GNSS_NPZ_DIR / f"{station}_600s_300s.npz"
+    out_path = GNSS_NPZ_DIR / f"{station}_{WIN}s_{STRIDE}s.npz"
     np.savez_compressed(
     out_path,
     X=windows.astype(np.float32),
