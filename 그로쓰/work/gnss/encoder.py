@@ -106,7 +106,7 @@ class GNSSFeatMapEncoder(nn.Module):
             self.ds = nn.Sequential(
                 nn.Conv1d(base_filters, base_filters, kernel_size=3, stride=2, padding=1, bias=False),
                 nn.BatchNorm1d(base_filters),
-                nn.Relu(),
+                nn.ReLU(),
             )
         else:
             raise ValueError(f"downsample must be one of ['none', 'pool', 'conv'], got: {downsample}")
@@ -137,7 +137,7 @@ class GNSSFeatMapEncoder(nn.Module):
         x = self.res(x)         # (B, F, T)
 
         #downsample (optional)
-        if (not self.auto_downsample) or (T > self.threshold_T):
+        if (self.auto_downsample) and (T > self.threshold_T):
             x = self.ds(x)      # (B, F, T')    (Identity/pool/stride-conv)
         
         #BiLSTM + align
