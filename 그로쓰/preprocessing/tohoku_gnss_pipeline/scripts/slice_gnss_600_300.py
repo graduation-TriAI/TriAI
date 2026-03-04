@@ -7,12 +7,11 @@ due to insufficient data length or parsing issues.
 
 from pathlib import Path
 from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
+from shared.config import WIN, STRIDE
 import re
 import pandas as pd
 import numpy as np
 
-WIN = 600
-STRIDE = 300
 FS = 1.0  # Hz (sampling rate)
 
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"

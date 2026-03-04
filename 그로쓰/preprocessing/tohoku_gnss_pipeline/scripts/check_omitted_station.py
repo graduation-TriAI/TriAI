@@ -5,11 +5,9 @@ and export the list of missing stations.
 """
 
 from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC
+from shared.config import WIN, STRIDE
 import re
 import pandas as pd
-
-WIN = 600
-STRIDE = 300
 
 IN_300KM_CSV = CSV_GNSS / "stations_tohoku_bbox.csv"
 OUT_MISSING_CSV = CSV_GNSS / "missing_stations_tohoku_vs_windows.csv"

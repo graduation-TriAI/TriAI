@@ -5,6 +5,7 @@ and save the unique station list to CSV.
 """
 
 from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC
+from shared.config import WIN, STRIDE
 import re
 import pandas as pd
 
