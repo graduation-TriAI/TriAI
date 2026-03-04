@@ -7,7 +7,7 @@ due to insufficient data length or parsing issues.
 
 from pathlib import Path
 from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
-from shared.config import WIN, STRIDE, SAMPLING_RATE
+from shared.config import WIN, STRIDE, GNSS_SAMPLING_RATE as SAMPLING_RATE
 import re
 import pandas as pd
 import numpy as np
