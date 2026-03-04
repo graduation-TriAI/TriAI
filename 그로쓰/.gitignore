@@ -17,6 +17,7 @@ Thumbs.db
 #Data folders (large files)
 preprocessing/tohoku_gnss_pipeline/data/*
 preprocessing/tohoku_seismic_pipeline/data/*
+data/*
 
 #Keep documentation files
 !preprocessing/tohoku_gnss_pipeline/data/raw/README_DATA.md
