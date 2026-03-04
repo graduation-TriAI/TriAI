@@ -160,8 +160,11 @@ class GNSSFeatMapEncoder(nn.Module):
 if __name__ == "__main__":
     npz_dir = GNSS_NPZ_DIR   
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Device:", device)
+
     # ==== 인코더 생성 ====
-    enc = GNSSFeatMapEncoder(downsample="none")
+    enc = GNSSFeatMapEncoder(downsample="none").to(device)
     enc.eval()
 
     print("Start feature extraction...\n")
@@ -190,9 +193,10 @@ if __name__ == "__main__":
                 print("No 'start_sec' metadata found.")
 
             if fs is not None:
-                print("Sampling rate:", fs.item(), "Hz")
+                fs_val = fs.item() if hasattr(fs, "item") else fs
+                print("Sampling rate:", fs_val, "Hz")
 
-            x = torch.from_numpy(X).float()
+            x = torch.from_numpy(X).float().to(device, non_blocking=True)
 
             feat = enc(x)
 
