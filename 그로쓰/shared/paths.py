@@ -1,6 +1,6 @@
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] #2아닌가?
+ROOT = Path(__file__).resolve().parents[1] 
 
 #top-level folders
 DATA = ROOT / "data"
