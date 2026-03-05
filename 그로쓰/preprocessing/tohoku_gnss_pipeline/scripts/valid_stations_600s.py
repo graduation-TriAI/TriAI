@@ -9,9 +9,6 @@ from shared.config import WIN, STRIDE
 import re
 import pandas as pd
 
-WIN = 600
-STRIDE = 300
-
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 OUT = CSV_GNSS / "stations_tohoku_valid_600s.csv"
 
