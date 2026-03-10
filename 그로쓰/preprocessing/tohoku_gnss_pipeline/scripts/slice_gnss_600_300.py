@@ -14,6 +14,7 @@ import numpy as np
 
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 STATION_LIST = CSV_GNSS / "stations_tohoku_bbox.csv"
+LATLON_CSV = CSV_GNSS / "stations_latlon_1221.csv"
 GNSS_NPZ_DIR.mkdir(parents=True, exist_ok=True)
 
 STATION_RE = re.compile(r"(GNET\d{4})", re.I)
@@ -22,6 +23,19 @@ stations_df = pd.read_csv(STATION_LIST)
 target_stations = set(stations_df["station"].astype(str).str.upper().tolist())
 print("Number of target stations:", len(target_stations))
 
+def load_station_latlon(csv_path):
+    df = pd.read_csv(csv_path)
+
+    station_dict = {}
+
+    for station, lat, lon in zip(df["station"], df["latitude"], df["longitude"]):
+        station = str(station).upper()
+        station_dict[station] = (lat, lon)
+
+    return station_dict
+
+station_dict = load_station_latlon(LATLON_CSV)
+print("Number of stations with lat/lon: ", len(station_dict))
 
 def find_header_line(fp: Path, max_lines: int = 200) -> int:
     """Return the line index where the tabular header starts (line begins with 'Date/Time')."""
@@ -41,6 +55,22 @@ def load_gnss_tab(fp: Path) -> pd.DataFrame:
     df = pd.read_csv(fp, sep="\t", skiprows=header_idx, engine="python")
     return df
 
+def pick_col(df, key: str) -> str:
+        """Pick a column name that matches 'key' (case-insensitive), tolerant to extra text in headers."""
+        key_lower = key.lower()
+
+        #Prefer exact first-token match (e.g., "East", "East(cm)")
+        for col in df.columns:
+            first_word = str(col).lower().split()[0]
+            if first_word == key_lower:
+                return col
+
+        #Fallback: substring match
+        for col in df.columns:
+            if key_lower in str(col).lower():
+                return col
+
+        raise KeyError(f"Column for '{key}' not found. Available columns: {list(df.columns)}")
 
 def slice_windows(arr: np.ndarray, win: int, stride: int, fs: float):
     """
@@ -65,6 +95,7 @@ processed = 0
 skipped_small = 0
 failed_read = 0
 failed_cols = 0
+failed_latlon = 0
 
 for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     m = STATION_RE.search(tab_file.name)
@@ -73,8 +104,15 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     station = m.group(1).upper()
     if station not in target_stations:
         continue
+    
+    if station not in station_dict:
+        failed_latlon += 1
+        print(f"Lat/Lon not found for station: {station}")
+        continue
 
-    print("Processing...:", station)
+    lat, lon = station_dict[station]
+
+    print(f"Processing: {station}")
 
     try:
         df = load_gnss_tab(tab_file)
@@ -82,23 +120,6 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
         failed_read += 1
         print("Failed to read file:", tab_file.name, "->", type(e).__name__, e)
         continue
-
-    def pick_col(df, key: str) -> str:
-        """Pick a column name that matches 'key' (case-insensitive), tolerant to extra text in headers."""
-        key_lower = key.lower()
-
-        #Prefer exact first-token match (e.g., "East", "East(cm)")
-        for col in df.columns:
-            first_word = str(col).lower().split()[0]
-            if first_word == key_lower:
-                return col
-
-        #Fallback: substring match
-        for col in df.columns:
-            if key_lower in str(col).lower():
-                return col
-
-        raise KeyError(f"Column for '{key}' not found. Available columns: {list(df.columns)}")
 
     try:
         east_col = pick_col(df, "East")
@@ -123,7 +144,11 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     out_path,
     X=windows.astype(np.float32),
     start_sec=start_sec,                 # (N,)
-    fs=np.array([SAMPLING_RATE], dtype=np.float32)  # (1,)
+    end_sec=start_sec + WIN, 
+    fs=np.array([SAMPLING_RATE], dtype=np.float32),  # (1,)
+    station=np.array([station]),
+    lat=np.array([lat], dtype=np.float32),
+    lon=np.array([lon], dtype=np.float32),
 )
 
     total_windows += windows.shape[0]
@@ -134,4 +159,5 @@ print("Processed stations:", processed)
 print("Stations with no windows (too short, etc.):", skipped_small)
 print("Failed to read files:", failed_read)
 print("Failed to find required columns:", failed_cols)
+print("Failed to find lat/lon:", failed_latlon)
 print("Total windows generated:", total_windows)
