@@ -1,9 +1,9 @@
 import pandas as pd
 from shared.paths import PAIRS_TOHOKU_CSV, PGV_TOHOKU
 
-PAIR_CSV = PAIRS_TOHOKU_CSV / "station_pairs_ver_20km.csv"
+PAIR_CSV = PAIRS_TOHOKU_CSV / "station_pairs_ver_15km.csv"
 PGV_CSV = PGV_TOHOKU / "processed_pgv_data2.csv"
-OUT_CSV = PGV_TOHOKU / "gnss_pgv_labels_20km.csv"
+OUT_CSV = PGV_TOHOKU / "gnss_pgv_labels_15km.csv"
 
 pairs_df = pd.read_csv(PAIR_CSV)
 pgv_df = pd.read_csv(PGV_CSV)
