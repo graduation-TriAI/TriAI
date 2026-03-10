@@ -5,9 +5,9 @@ import pandas as pd
 from shared.paths import GNSS_TOHOKU_PROC, PGV_TOHOKU
 from shared.config import WIN, STRIDE
 
-LABEL_CSV = PGV_TOHOKU / "gnss_pgv_labels_20km.csv"
+LABEL_CSV = PGV_TOHOKU / "gnss_pgv_labels_15km.csv"
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
-OUT_NPZ = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_20km.npz"
+OUT_NPZ = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
 
 ST_RE = re.compile(r"(GNET\d{4})", re.I)
 
