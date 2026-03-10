@@ -122,13 +122,10 @@ class GNSSFeatMapEncoder(nn.Module):
             bidirectional=True,
         )
 
-        self.align = nn.Sequential(
-            nn.Conv1d(2 * lstm_units, base_filters, 1, bias=True),
-            nn.ReLU(),
-        )
+        self.align = nn.Identity()
 
         self.tx = TransformerBlock(
-            d_model=base_filters, num_heads=num_heads, dropout=dropout, ff_mult=ff_mult
+            d_model=2 * lstm_units, num_heads=num_heads, dropout=dropout, ff_mult=ff_mult
         )
 
     def forward(self, x, return_attn=False):
@@ -148,8 +145,8 @@ class GNSSFeatMapEncoder(nn.Module):
         x, _ = self.bilstm(x)   # (B, T', 2*lstm_units)
 
         x = x.transpose(1, 2)   # (B, 2*lstm_units, T')
-        x = self.align(x)       # (B, F, T')
-        x = x.transpose(1, 2)   # (B, T', F)
+        x = self.align(x)       # (B, 2*lstm_units, T')
+        x = x.transpose(1, 2)   # (B, T', 2*lstm_units)
 
         #Transformer (EQT-style)
         if return_attn:
