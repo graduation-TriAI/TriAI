@@ -30,8 +30,8 @@ def plot_pgv_distribution(y):
     plt.hist(y, bins=50)
     plt.title("PGV Distribution")
     plt.xlabel("PGV")
-    plt.ylabel("Count")
-    plt.show()
+    plt.savefig("pgv_hist.png")
+    plt.close()
 
 
 def plot_log_pgv_distribution(y):
@@ -41,7 +41,8 @@ def plot_log_pgv_distribution(y):
     plt.title("log(PGV) Distribution")
     plt.xlabel("log(PGV)")
     plt.ylabel("Count")
-    plt.show()
+    plt.savefig("log_pgv_hist.png")
+    plt.close()
 
 
 def prediction_scatter(y_true, y_pred):
@@ -55,9 +56,8 @@ def prediction_scatter(y_true, y_pred):
 
     plt.xlabel("True PGV")
     plt.ylabel("Predicted PGV")
-    plt.title("Prediction vs Ground Truth")
-
-    plt.show()
+    plt.savefig("prediction_scatter.png")
+    plt.close()
 
 
 def main():
