@@ -78,7 +78,7 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
 
     return avg_loss, rmse
 
-def evaluate(model, loader, criterion, device):
+def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
     model.eval()
 
     total_loss = 0.0
