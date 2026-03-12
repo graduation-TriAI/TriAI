@@ -1,41 +1,35 @@
 """
 Visualization utilities for GNSS PGV prediction
-
-This script:
-1. Plots PGV distribution
-2. Plots log(PGV) distribution
-3. Plots prediction vs ground truth scatter
 """
 
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 
 from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
 from work.gnss.train import GNSSPGVDataset
 
-
 DATA_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
 MODEL_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km.pt"
 
 BATCH_SIZE = 64
+TRAIN_RATIO = 0.8
+SEED = 42
 
 
 def plot_pgv_distribution(y):
-    """Plot raw PGV distribution"""
     plt.figure()
     plt.hist(y, bins=50)
     plt.title("PGV Distribution")
     plt.xlabel("PGV")
+    plt.ylabel("Count")
     plt.savefig("pgv_hist.png")
     plt.close()
 
 
 def plot_log_pgv_distribution(y):
-    """Plot log(PGV) distribution"""
     plt.figure()
     plt.hist(np.log(y), bins=50)
     plt.title("log(PGV) Distribution")
@@ -46,9 +40,7 @@ def plot_log_pgv_distribution(y):
 
 
 def prediction_scatter(y_true, y_pred):
-    """Plot prediction vs ground truth"""
     plt.figure()
-
     plt.scatter(y_true, y_pred, alpha=0.5)
 
     max_val = max(y_true.max(), y_pred.max())
@@ -56,59 +48,79 @@ def prediction_scatter(y_true, y_pred):
 
     plt.xlabel("True PGV")
     plt.ylabel("Predicted PGV")
+    plt.title("Prediction vs Ground Truth")
     plt.savefig("prediction_scatter.png")
     plt.close()
 
 
 def main():
+    torch.manual_seed(SEED)
+    np.random.seed(SEED)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
     dataset = GNSSPGVDataset(DATA_PATH)
+    y_all = dataset.y.numpy()
 
-    y = dataset.y.numpy()
+    # 1) 전체 데이터 분포 시각화
+    plot_pgv_distribution(y_all)
+    plot_log_pgv_distribution(y_all)
 
-    # -------------------------------
-    # 1. PGV distribution
-    # -------------------------------
-    plot_pgv_distribution(y)
+    # 2) train/val split을 train.py와 동일하게 재현
+    train_size = int(len(dataset) * TRAIN_RATIO)
+    val_size = len(dataset) - train_size
 
-    # -------------------------------
-    # 2. log(PGV) distribution
-    # -------------------------------
-    plot_log_pgv_distribution(y)
+    train_dataset, val_dataset = random_split(
+        dataset,
+        [train_size, val_size],
+        generator=torch.Generator().manual_seed(SEED)
+    )
 
-    # -------------------------------
-    # 3. Load model
-    # -------------------------------
+    train_indices = train_dataset.indices
+    val_indices = val_dataset.indices
+
+    # 3) train set 기준 정규화 통계 다시 계산
+    y_train = dataset.y[train_indices]
+    y_mean = y_train.mean()
+    y_std = y_train.std()
+
+    if y_std < 1e-8:
+        y_std = torch.tensor(1.0)
+
+    print(f"y_mean: {y_mean.item():.6f}, y_std: {y_std.item():.6f}")
+
+    # 4) 모델 로드
     model = GNSSModel().to(device)
     model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
     model.eval()
 
-    loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
+    # 5) val set만 평가
+    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    y_true = []
-    y_pred = []
+    y_true_list = []
+    y_pred_list = []
 
     with torch.no_grad():
-
-        for X, y in loader:
-
+        for X, y in val_loader:
             X = X.to(device)
 
-            pred = model(X).cpu().numpy().flatten()
+            pred_norm = model(X).cpu().squeeze(1)
 
-            y_pred.append(pred)
-            y_true.append(y.numpy())
+            # 정규화된 예측값 -> 원래 PGV 스케일로 복원
+            pred_orig = pred_norm * y_std + y_mean
 
-    y_true = np.concatenate(y_true)
-    y_pred = np.concatenate(y_pred)
+            y_pred_list.append(pred_orig.numpy())
+            y_true_list.append(y.numpy())
 
-    # -------------------------------
-    # 4. Prediction scatter
-    # -------------------------------
+    y_true = np.concatenate(y_true_list)
+    y_pred = np.concatenate(y_pred_list)
+
+    print("True PGV range :", y_true.min(), "~", y_true.max())
+    print("Pred PGV range :", y_pred.min(), "~", y_pred.max())
+
     prediction_scatter(y_true, y_pred)
+    print("Saved: pgv_hist.png, log_pgv_hist.png, prediction_scatter.png")
 
 
 if __name__ == "__main__":
