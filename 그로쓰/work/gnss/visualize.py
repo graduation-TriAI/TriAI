@@ -52,6 +52,31 @@ def prediction_scatter(y_true, y_pred):
     plt.savefig("prediction_scatter.png")
     plt.close()
 
+def error_vs_true(y_true, y_pred):
+    """Plot absolute error vs true PGV"""
+    abs_error = np.abs(y_pred - y_true)
+
+    plt.figure()
+    plt.scatter(y_true, abs_error, alpha=0.5)
+    plt.xlabel("True PGV")
+    plt.ylabel("Absolute Error")
+    plt.title("Absolute Error vs True PGV")
+    plt.savefig("error_vs_true.png")
+    plt.close()
+
+
+def residual_vs_true(y_true, y_pred):
+    """Plot residual (pred - true) vs true PGV"""
+    residual = y_pred - y_true
+
+    plt.figure()
+    plt.scatter(y_true, residual, alpha=0.5)
+    plt.axhline(0, linestyle="--")
+    plt.xlabel("True PGV")
+    plt.ylabel("Residual (Pred - True)")
+    plt.title("Residual vs True PGV")
+    plt.savefig("residual_vs_true.png")
+    plt.close()
 
 def main():
     torch.manual_seed(SEED)
@@ -120,7 +145,11 @@ def main():
     print("Pred PGV range :", y_pred.min(), "~", y_pred.max())
 
     prediction_scatter(y_true, y_pred)
-    print("Saved: pgv_hist.png, log_pgv_hist.png, prediction_scatter.png")
+    error_vs_true(y_true, y_pred)
+    residual_vs_true(y_true, y_pred)
+
+    print("Saved: pgv_hist.png, log_pgv_hist.png, prediction_scatter.png, error_vs_true.png, residual_vs_true.png")
+
 
 
 if __name__ == "__main__":
