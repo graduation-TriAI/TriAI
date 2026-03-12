@@ -11,7 +11,7 @@ DATA_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
 MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km.pt"
 
 BATCH_SIZE = 32
-EPOCHS = 30 #우선은 30으로 하고 나중에 100으로 늘리기!
+EPOCHS = 100 #우선은 30으로 하고 나중에 100으로 늘리기!
 LR = 1e-3
 TRAIN_RATIO = 0.8
 SEED = 42
@@ -166,8 +166,8 @@ def main():
             f"Val Loss: {val_loss:.6f} | Val RMSE: {val_rmse:.6f}"
         )
 
-        if best_model_weights is not None:
-            model.load_state_dict(best_model_weights)
+    if best_model_weights is not None:
+        model.load_state_dict(best_model_weights)
         
     print("\nTraining finished.")
     print("Best val loss:", best_val_loss)
