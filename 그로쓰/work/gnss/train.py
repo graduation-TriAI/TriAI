@@ -32,6 +32,22 @@ class GNSSPGVDataset(Dataset):
         y = self.y[idx]
         return x, y
     
+class NormalizedSubset(Dataset):
+    def __init__(self, base_dataset, indices, y_mean, y_std):
+        self.base_dataset = base_dataset
+        self.indices = indices
+        self.y_mean = y_mean
+        self.y_std = y_std
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        real_idx = self.indices[idx]
+        x, y = self.base_dataset[real_idx]
+        y_norm = (y - self.y_mean) / self.y_std
+        return x, y_norm
+
 def train_one_epoch(model, loader, criterion, optimizer, device):
     model.train()
 
@@ -81,12 +97,22 @@ def evaluate(model, loader, criterion, device):
 
             total_loss += loss.item() * batch_size
             total_sq_error += torch.sum((pred - y) ** 2).item()
+
+            if y_mean is not None and y_std is not None:
+                pred_orig = pred * y_std.to(device) + y_mean.to(device)
+                y_orig = y * y_std.to(device) + y_mean.to(device)
+                total_sq_error_orig += torch.sum((pred_orig - y_orig) ** 2).item()
+
             total_count += batch_size
 
     avg_loss = total_loss / total_count
-    rmse = (total_sq_error / total_count) ** 0.5
+    rmse = (total_sq_error / total_count) ** 0.54
 
-    return avg_loss, rmse
+    if y_mean is not None and y_std is not None:
+        rmse_orig = (total_sq_error_orig / total_count) ** 0.5
+        return avg_loss, rmse, rmse_orig
+
+    return avg_loss, rmse, None
 
 def main():
     torch.manual_seed(SEED)
@@ -106,6 +132,21 @@ def main():
         [train_size, val_size],
         generator=torch.Generator().manual_seed(SEED)
     )
+
+    train_indices = train_dataset.indices
+    val_indices = val_dataset.indices
+
+    y_train = dataset.y[train_indices]
+    y_mean = y_train.mean()
+    y_std = y_train.std()
+
+    if y_std < 1e-8:
+        y_std = torch.tensor(1.0)
+
+    print(f"y_mean: {y_mean.item():.6f}, y_std: {y_std.item():.6f}")
+
+    train_dataset = NormalizedSubset(dataset, train_indices, y_mean, y_std)
+    val_dataset = NormalizedSubset(dataset, val_indices, y_mean, y_std)
 
     print("Train samples:", len(train_dataset))
     print("Val samples:", len(val_dataset))
@@ -146,8 +187,8 @@ def main():
             model, train_loader, criterion, optimizer, device
         )
 
-        val_loss, val_rmse = evaluate(
-            model, val_loader, criterion, device
+        val_loss, val_rmse, val_rmse_orig = evaluate(
+            model, val_loader, criterion, device, y_mean, y_std
         )
 
         scheduler.step()
@@ -164,6 +205,7 @@ def main():
             f"LR: {current_lr:.8f} | "
             f"Train Loss: {train_loss:.6f} | Train RMSE: {train_rmse:.6f} | "
             f"Val Loss: {val_loss:.6f} | Val RMSE: {val_rmse:.6f}"
+            f"(Original PGV RMSE: {val_rmse_orig:.6f})"
         )
 
     if best_model_weights is not None:
