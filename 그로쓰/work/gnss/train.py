@@ -84,7 +84,7 @@ def evaluate(model, loader, criterion, device):
             total_count += batch_size
 
     avg_loss = total_loss / total_count
-    rmse = (total_sq_error) / total_count
+    rmse = (total_sq_error / total_count) ** 0.5
 
     return avg_loss, rmse
 
