@@ -169,11 +169,11 @@ def main():
         if best_model_weights is not None:
             model.load_state_dict(best_model_weights)
         
-        print("\nTraining finished.")
-        print("Best val loss:", best_val_loss)
-        print("Best model saved to:", MODEL_SAVE_PATH)
+    print("\nTraining finished.")
+    print("Best val loss:", best_val_loss)
+    print("Best model saved to:", MODEL_SAVE_PATH)
 
-        return model
+    return model
     
 
 if __name__ == "__main__":
