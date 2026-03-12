@@ -124,7 +124,7 @@ def main():
         drop_last=False
     )
 
-    model = GNSSModel.to(device)
+    model = GNSSModel().to(device)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
