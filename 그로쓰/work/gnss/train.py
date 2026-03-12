@@ -83,6 +83,7 @@ def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
 
     total_loss = 0.0
     total_sq_error = 0.0
+    total_sq_error_orig = 0.0 
     total_count = 0
 
     with torch.no_grad():
@@ -106,7 +107,7 @@ def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
             total_count += batch_size
 
     avg_loss = total_loss / total_count
-    rmse = (total_sq_error / total_count) ** 0.54
+    rmse = (total_sq_error / total_count) ** 0.5
 
     if y_mean is not None and y_std is not None:
         rmse_orig = (total_sq_error_orig / total_count) ** 0.5
@@ -204,7 +205,7 @@ def main():
             f"Epoch [{epoch:03d}/{EPOCHS}] "
             f"LR: {current_lr:.8f} | "
             f"Train Loss: {train_loss:.6f} | Train RMSE: {train_rmse:.6f} | "
-            f"Val Loss: {val_loss:.6f} | Val RMSE: {val_rmse:.6f}"
+            f"Val Loss: {val_loss:.6f} | Val RMSE: {val_rmse:.6f} "
             f"(Original PGV RMSE: {val_rmse_orig:.6f})"
         )
 
