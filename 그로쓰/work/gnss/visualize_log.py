@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, random_split
 
 from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
-from work.gnss.train_log import GNSSPGVDataset   # log(PGV) dataset import
+from 그로쓰.work.gnss.train_y_log import GNSSPGVDataset   # log(PGV) dataset import
 
 DATA_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
 MODEL_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_log_best_15km.pt"
