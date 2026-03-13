@@ -8,7 +8,7 @@ from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
 
 DATA_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
-MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only.pt"
+MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only_SmoothL1Loss.pt"
 
 BATCH_SIZE = 32
 EPOCHS = 100 #우선은 30으로 하고 나중에 100으로 늘리기!
@@ -168,7 +168,7 @@ def main():
 
     model = GNSSModel().to(device)
 
-    criterion = nn.MSELoss()
+    criterion = nn.SmoothL1Loss()    #MSELoss() -> SmoothL1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
