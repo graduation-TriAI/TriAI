@@ -16,7 +16,7 @@ LR = 5e-4   #1e-3, 5e-4, 3e-4, 1e-4
 TRAIN_RATIO = 0.8
 SEED = 42
 
-DROP_LAST = False #이후 True로 바꿔서 실험해 보기
+DROP_LAST = True #이후 True로 바꿔서 실험해 보기
 
 class GNSSPGVDataset(Dataset):
     def __init__(self, npz_path):
@@ -169,7 +169,7 @@ def main():
     model = GNSSModel().to(device)
 
     criterion = nn.MSELoss()    #MSELoss() -> SmoothL1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=0)
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
         optimizer,
