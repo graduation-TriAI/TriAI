@@ -9,10 +9,10 @@ from torch.utils.data import DataLoader, random_split
 
 from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
-from work.gnss.train import GNSSPGVDataset
+from 그로쓰.work.gnss.baseline_y_only import GNSSPGVDataset
 
 DATA_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
-MODEL_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km.pt"
+MODEL_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only.pt"
 
 BATCH_SIZE = 64
 TRAIN_RATIO = 0.8
