@@ -12,7 +12,7 @@ MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_X_and_y_norm_SmoothL1Lo
 
 BATCH_SIZE = 32
 EPOCHS = 100 #우선은 30으로 하고 나중에 100으로 늘리기!
-LR = 1e-3
+LR = 5e-4   #1e-3, 5e-4, 3e-4, 1e-4
 TRAIN_RATIO = 0.8
 SEED = 42
 
