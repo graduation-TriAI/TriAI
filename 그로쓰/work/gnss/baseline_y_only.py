@@ -169,7 +169,7 @@ def main():
     model = GNSSModel().to(device)
 
     criterion = nn.MSELoss()    #MSELoss() -> SmoothL1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=0)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-5)
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
         optimizer,
