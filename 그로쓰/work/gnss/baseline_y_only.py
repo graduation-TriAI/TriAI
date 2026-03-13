@@ -8,11 +8,11 @@ from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
 
 DATA_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km.npz"
-MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only_SmoothL1Loss_lr=1e-4.pt"
+MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only_MSE_lr=5e-4.pt"
 
 BATCH_SIZE = 32
 EPOCHS = 100 #우선은 30으로 하고 나중에 100으로 늘리기!
-LR = 1e-4   #1e-3, 5e-4, 3e-4, 1e-4
+LR = 5e-4   #1e-3, 5e-4, 3e-4, 1e-4
 TRAIN_RATIO = 0.8
 SEED = 42
 
@@ -168,7 +168,7 @@ def main():
 
     model = GNSSModel().to(device)
 
-    criterion = nn.SmoothL1Loss()    #MSELoss() -> SmoothL1Loss()
+    criterion = nn.MSELoss()    #MSELoss() -> SmoothL1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
@@ -177,7 +177,7 @@ def main():
         gamma=0.1
     )
 
-    best_val_loss = float("inf")
+    best_val_rmse_orig = float("inf")
     best_model_weights = None
 
     print("\n ============================ Train ===============================")
@@ -192,11 +192,10 @@ def main():
             model, val_loader, criterion, device, y_mean, y_std
         )
 
-        scheduler.step()
         current_lr = optimizer.param_groups[0]["lr"]
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        if val_rmse_orig < best_val_rmse_orig:
+            best_val_rmse_orig = val_rmse_orig
             best_model_weights = copy.deepcopy(model.state_dict())
             torch.save(best_model_weights, MODEL_SAVE_PATH)
             print("   -> Best model saved")
@@ -209,11 +208,13 @@ def main():
             f"(Original PGV RMSE: {val_rmse_orig:.6f})"
         )
 
+        scheduler.step()
+
     if best_model_weights is not None:
         model.load_state_dict(best_model_weights)
         
     print("\nTraining finished.")
-    print("Best val loss:", best_val_loss)
+    print("Best Original PGV RMSE:", best_val_rmse_orig)
     print("Best model saved to:", MODEL_SAVE_PATH)
 
     return model
