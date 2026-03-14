@@ -150,8 +150,8 @@ def convert_one_station_file(file_path: Path, output_dir: Path, origin_time: pd.
         "Up [cm]": up_cm_list,
     })
 
-    start_time = origin_time - pd.Timedelta(minutes=1, seconds=24)
-    end_time = origin_time + pd.Timedelta(minutes=43, seconds=36)
+    end_time = pd.Timestamp("2024-01-01 07:39:59")
+    start_time = end_time - pd.Timedelta(minutes=45)
 
     mask = (df["datetime"] >= start_time) & (df["datetime"] <= end_time)
 
