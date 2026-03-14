@@ -6,15 +6,15 @@ due to insufficient data length or parsing issues.
 """
 
 from pathlib import Path
-from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
+from shared.paths import GNSS_TOHOKU_CSV, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
 from shared.config import WIN, STRIDE, GNSS_SAMPLING_RATE as SAMPLING_RATE
 import re
 import pandas as pd
 import numpy as np
 
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
-STATION_LIST = CSV_GNSS / "stations_tohoku_bbox.csv"
-LATLON_CSV = CSV_GNSS / "stations_latlon_1221.csv"
+STATION_LIST = GNSS_TOHOKU_CSV / "stations_tohoku_bbox.csv"
+LATLON_CSV = GNSS_TOHOKU_CSV / "stations_latlon_1221.csv"
 GNSS_NPZ_DIR.mkdir(parents=True, exist_ok=True)
 
 STATION_RE = re.compile(r"(GNET\d{4})", re.I)

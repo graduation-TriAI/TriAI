@@ -4,11 +4,11 @@ Filter stations located within 300km of the Tohoku epicenter
 based on precomputed distance values.
 """
 
-from shared.paths import CSV_GNSS
+from shared.paths import GNSS_TOHOKU_CSV
 import pandas as pd
 
-INPUT_CSV = CSV_GNSS / "gnss_stations_sorted_by_distance.csv"
-OUTPUT_CSV = CSV_GNSS / "stations_within_300km.csv"
+INPUT_CSV = GNSS_TOHOKU_CSV / "gnss_stations_sorted_by_distance.csv"
+OUTPUT_CSV = GNSS_TOHOKU_CSV / "stations_within_300km.csv"
 
 df = pd.read_csv(INPUT_CSV)
 

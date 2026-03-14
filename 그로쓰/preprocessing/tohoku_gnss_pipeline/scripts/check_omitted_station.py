@@ -4,13 +4,13 @@ Compare stations within Tohoku region against generated GNSS window files
 and export the list of missing stations.
 """
 
-from shared.paths import CSV_GNSS, GNSS_TOHOKU_PROC
+from shared.paths import GNSS_TOHOKU_CSV, GNSS_TOHOKU_PROC
 from shared.config import WIN, STRIDE
 import re
 import pandas as pd
 
-IN_300KM_CSV = CSV_GNSS / "stations_tohoku_bbox.csv"
-OUT_MISSING_CSV = CSV_GNSS / "missing_stations_tohoku_vs_windows.csv"
+IN_300KM_CSV = GNSS_TOHOKU_CSV / "stations_tohoku_bbox.csv"
+OUT_MISSING_CSV = GNSS_TOHOKU_CSV / "missing_stations_tohoku_vs_windows.csv"
 GNSS_NPZ_DIR = GNSS_TOHOKU_PROC / f"gnss_windowed_{WIN}_{STRIDE}"
 
 #Extract station ID (e.g., GNET0001) from filename
