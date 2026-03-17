@@ -15,7 +15,7 @@ from shared.config import WIN, STRIDE, GNSS_SAMPLING_RATE as SAMPLING_RATE
 
 
 GNSS_CSV_DIR = GNSS_NOTO_CSV / "enu"
-OUT_PATH = GNSS_NOTO_PROC / f"gnss_station_seq_{WIN}_{STRIDE}.npz"
+OUT_PATH = GNSS_NOTO_PROC / f"noto_gnss_station_seq_{WIN}_{STRIDE}.npz"
 STATION_LIST = GNSS_NOTO_CSV / "stations_within_250km.csv"
 LATLON_CSV = GNSS_NOTO_CSV / "stations_latlon.csv"
 
