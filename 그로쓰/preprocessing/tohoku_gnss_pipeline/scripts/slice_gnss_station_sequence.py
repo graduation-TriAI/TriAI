@@ -12,7 +12,7 @@ import re
 import pandas as pd
 import numpy as np
 
-out_path = GNSS_TOHOKU_PROC / f"gnss_station_seq_{WIN}_{STRIDE}.npz"
+out_path = GNSS_TOHOKU_PROC / f"tohoku_gnss_station_seq_{WIN}_{STRIDE}.npz"
 STATION_LIST = GNSS_TOHOKU_CSV / "stations_tohoku_bbox.csv"
 LATLON_CSV = GNSS_TOHOKU_CSV / "stations_latlon_1221.csv"
 
