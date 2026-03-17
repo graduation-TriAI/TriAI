@@ -2,13 +2,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from shared.paths import GNSS_TOHOKU_PROC, PGV_TOHOKU
+from shared.paths import GNSS_NOTO_PROC, PGV_NOTO
 from shared.config import WIN, STRIDE
 
 
-LABEL_CSV = PGV_TOHOKU / "gnss_pgv_labels_15km.csv"
-INPUT_PATH = GNSS_TOHOKU_PROC / f"gnss_station_seq_{WIN}_{STRIDE}.npz"
-OUT_NPZ = GNSS_TOHOKU_PROC / "gnss_pgv_dataset_15km_seq.npz"
+LABEL_CSV = PGV_NOTO / "noto_gnss_pgv_labels_15km.csv"
+INPUT_PATH = GNSS_NOTO_PROC / f"noto_gnss_station_seq_{WIN}_{STRIDE}.npz"
+OUT_NPZ = GNSS_NOTO_PROC / "noto_gnss_pgv_dataset_15km_seq.npz"
 
 
 def normalize_station(series: pd.Series) -> pd.Series:
