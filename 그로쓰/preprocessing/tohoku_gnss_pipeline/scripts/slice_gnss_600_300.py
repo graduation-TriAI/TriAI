@@ -134,6 +134,13 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
     data = df[[east_col, north_col, up_col]].apply(pd.to_numeric, errors="coerce").dropna().to_numpy()
     # data shape: (T,3)
 
+    mean = data.mean(axis=0)
+    std = data.std(axis=0)
+
+    std[std < 1e-8] = 1.0
+
+    data = (data - mean) / std
+
     windows, start_sec = slice_windows(data, WIN, STRIDE, SAMPLING_RATE)
     if windows.shape[0] == 0:
         skipped_small += 1
