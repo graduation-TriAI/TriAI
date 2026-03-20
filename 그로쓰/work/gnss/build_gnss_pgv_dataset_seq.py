@@ -2,21 +2,29 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from shared.paths import GNSS_NOTO_PROC, PGV_NOTO
+from shared.paths import GNSS_TOHOKU_PROC, PAIRS_TOHOKU_CSV
 from shared.config import WIN, STRIDE
 
+PAIR_LABEL_CSV = PAIRS_TOHOKU_CSV / "tohoku_station_pairs_ver_15km.csv"
 
-LABEL_CSV = PGV_NOTO / "noto_gnss_pgv_labels_15km.csv"
-INPUT_PATH = GNSS_NOTO_PROC / f"noto_gnss_station_seq_{WIN}_{STRIDE}.npz"
-OUT_NPZ = GNSS_NOTO_PROC / "noto_gnss_pgv_dataset_15km_seq.npz"
+INPUT_PATH = GNSS_TOHOKU_PROC / f"tohoku_gnss_station_seq_{WIN}_{STRIDE}.npz"
+
+OUT_NPZ = GNSS_TOHOKU_PROC / "tohoku_gnss_pgv_dataset_15km_seq.npz"
 
 
 def normalize_station(series: pd.Series) -> pd.Series:
     return series.astype(str).str.strip().str.upper()
 
 
-def load_label_map(label_csv: Path):
-    df = pd.read_csv(label_csv)
+def load_label_map_from_pair_csv(pair_csv: Path):
+    df = pd.read_csv(pair_csv)
+
+    required_cols = ["gnss_station", "seismic_station", "pgv"]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        raise KeyError(
+            f"Missing required columns in {pair_csv.name}: {missing_cols}"
+        )
 
     df["gnss_station"] = normalize_station(df["gnss_station"])
     df["seismic_station"] = normalize_station(df["seismic_station"])
@@ -24,6 +32,7 @@ def load_label_map(label_csv: Path):
 
     df = df.dropna(subset=["gnss_station", "seismic_station", "pgv"]).reset_index(drop=True)
 
+    # gnss_station 하나에 여러 행이 붙어 있으면 경고 후 첫 번째만 사용
     dup_counts = df.groupby("gnss_station").size()
     multi_matched = dup_counts[dup_counts > 1]
 
@@ -41,7 +50,8 @@ def load_label_map(label_csv: Path):
         for _, row in df.iterrows()
     }
 
-    print("Loaded labels:", len(label_map))
+    print("Loaded label rows:", len(df))
+    print("Loaded label_map:", len(label_map))
     return label_map
 
 
@@ -56,8 +66,8 @@ def build_dataset_from_single_npz(label_map, input_path: Path, out_npz: Path):
         if key not in data:
             raise KeyError(f"'{key}' not found in {input_path.name}")
 
-    X = data["X"]                       # (num_stations, 8, 600, 3)
-    gnss_station = data["station"]     # (num_stations,)
+    X = data["X"]                   # (num_stations, 8, 600, 3)
+    gnss_station = data["station"]  # (num_stations,)
 
     num_stations = len(gnss_station)
 
@@ -68,14 +78,14 @@ def build_dataset_from_single_npz(label_map, input_path: Path, out_npz: Path):
 
     # optional metadata
     if "start_sec" in data:
-        start_sec = data["start_sec"]  # (num_stations, 8)
+        start_sec = data["start_sec"]   # (num_stations, 8)
         has_start_sec = True
     else:
         start_sec = np.full((num_stations, X.shape[1]), -1, dtype=np.float32)
         has_start_sec = False
 
     if "end_sec" in data:
-        end_sec = data["end_sec"]      # (num_stations, 8)
+        end_sec = data["end_sec"]       # (num_stations, 8)
     else:
         end_sec = np.full((num_stations, X.shape[1]), -1, dtype=np.float32)
 
@@ -116,7 +126,7 @@ def build_dataset_from_single_npz(label_map, input_path: Path, out_npz: Path):
 
         seismic_station, pgv_value = label_map[station]
 
-        matched_X.append(X[i])  # (8, 600, 3)
+        matched_X.append(X[i])   # (8, 600, 3)
         matched_y.append(pgv_value)
         matched_gnss_station.append(station)
         matched_seismic_station.append(seismic_station)
@@ -128,11 +138,11 @@ def build_dataset_from_single_npz(label_map, input_path: Path, out_npz: Path):
 
     if not matched_X:
         raise RuntimeError(
-            "No matched samples found. Check label CSV and input NPZ station names."
+            "No matched samples found. Check station names in CSV and NPZ."
         )
 
-    X_all = np.stack(matched_X, axis=0).astype(np.float32)  # (matched_stations, 8, 600, 3)
-    y_all = np.array(matched_y, dtype=np.float32)           # (matched_stations,)
+    X_all = np.stack(matched_X, axis=0).astype(np.float32)
+    y_all = np.array(matched_y, dtype=np.float32)
     gnss_all = np.array(matched_gnss_station)
     seismic_all = np.array(matched_seismic_station)
     start_all = np.stack(matched_start_sec, axis=0).astype(np.float32)
@@ -172,10 +182,10 @@ def build_dataset_from_single_npz(label_map, input_path: Path, out_npz: Path):
 
 
 if __name__ == "__main__":
-    label_map = load_label_map(LABEL_CSV)
+    label_map = load_label_map_from_pair_csv(PAIR_LABEL_CSV)
 
     build_dataset_from_single_npz(
-        label_map,
-        INPUT_PATH,
-        OUT_NPZ,
+        label_map=label_map,
+        input_path=INPUT_PATH,
+        out_npz=OUT_NPZ,
     )
