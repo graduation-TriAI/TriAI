@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
 
-DATA_PATH = GNSS_TOHOKU_PROC / "tohoku_gnss_pgv_dataset_20km_seq.npz"
+DATA_PATH = GNSS_TOHOKU_PROC / "tohoku_gnss_pgv_dataset_25km_seq.npz"
 MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only_MSE_lr=5e-4.pt"
 
 BATCH_SIZE = 8
