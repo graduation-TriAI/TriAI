@@ -173,7 +173,7 @@ def main():
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
         optimizer,
-        milestones=[30, 60, 90, 120],    #milestones=[20, 40, 60, 90] / milestones=[30, 60, 90, 120],
+        milestones=[40, 80, 110],    #milestones=[20, 40, 60, 90] / milestones=[30, 60, 90, 120],
         gamma=0.1
     )
 
