@@ -16,7 +16,7 @@ LR = 1e-3   #1e-3, 5e-4, 3e-4, 1e-4
 TRAIN_RATIO = 0.8
 SEED = 42
 
-DROP_LAST = False #이후 True로 바꿔서 실험해 보기
+DROP_LAST = True #이후 True로 바꿔서 실험해 보기
 
 class GNSSPGVDataset(Dataset):
     def __init__(self, npz_path):
