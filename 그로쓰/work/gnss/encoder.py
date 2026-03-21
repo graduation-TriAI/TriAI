@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from shared.paths import GNSS_TOHOKU_PROC
 import numpy as np
 
-GNSS_NPZ = GNSS_TOHOKU_PROC / "tohoku_gnss_pgv_dataset_10km_seq.npz"
+GNSS_NPZ = GNSS_TOHOKU_PROC / "tohoku_gnss_pgv_dataset_15km_seq.npz"
 
 class ResBlock1D(nn.Module):
     def __init__(self, in_ch, out_ch, k=7, dropout=0.0):
