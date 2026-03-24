@@ -1,25 +1,27 @@
 
 """
-Slice raw GNSS .tab files into 600-second windows with 300-second overlap.
-Normalize each station's E/N/U time series, group 8 windows per station,
-and save a single compressed NPZ with shape (num_stations, 8, 600, 3).
+Slice raw GNSS .tab files into sliding windows.
+Normalize each station's E/N/U time series, group a fixed number of windows per station,
+and save a single compressed NPZ with shape (num_stations, num_windows, 600, 3).
 """
 
 from pathlib import Path
-from shared.paths import GNSS_TOHOKU_CSV, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW
+from shared.paths import GNSS_TOHOKU_CSV, GNSS_TOHOKU_PROC, GNSS_TOHOKU_RAW, PAIRS_TOHOKU_CSV
 from shared.config import WIN, STRIDE, GNSS_SAMPLING_RATE as SAMPLING_RATE
 import re
 import pandas as pd
 import numpy as np
 
-out_path = GNSS_TOHOKU_PROC / f"tohoku_gnss_station_seq_{WIN}_{STRIDE}.npz"
-STATION_LIST = GNSS_TOHOKU_CSV / "stations_tohoku_bbox.csv"
+base_dir = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" 
+base_dir.mkdir(parents=True, exist_ok=True)
+out_path = base_dir / f"tohoku_gnss_station_seq_{WIN}_{STRIDE}.npz"
+STATION_LIST = PAIRS_TOHOKU_CSV / "tohoku_station_pairs.csv"
 LATLON_CSV = GNSS_TOHOKU_CSV / "stations_latlon_1221.csv"
 
 STATION_RE = re.compile(r"(GNET\d{4})", re.I)
 
 stations_df = pd.read_csv(STATION_LIST)
-target_stations = set(stations_df["station"].astype(str).str.upper().tolist())
+target_stations = set(stations_df["gnss_station"].astype(str).str.upper().tolist())
 print("Number of target stations:", len(target_stations))
 
 def load_station_latlon(csv_path):
@@ -153,9 +155,9 @@ for tab_file in sorted(GNSS_TOHOKU_RAW.glob("*.tab")):
         skipped_small += 1
         continue
 
-    if windows.shape[0] != 8:
+    if windows.shape[0] != 21:
         skipped_wrong_windows += 1
-        print(f"Skipped {station}: expected 8 windows, got {windows.shape[0]}")
+        print(f"Skipped {station}: expected 21 windows, got {windows.shape[0]}")
         continue
 
     all_X.append(windows.astype(np.float32))
