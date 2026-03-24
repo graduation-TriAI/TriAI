@@ -1,5 +1,5 @@
 """
-Slice raw GNSS .tab files into 600-second windows with 300-second overlap
+Slice raw GNSS .tab files into sliding windows
 after upsampling to 100 Hz.
 
 Use the pre-matched station CSV as the source of allowed GNSS stations.
@@ -7,7 +7,7 @@ Normalize each station's E/N/U time series per component,
 slice windows, and save one compressed NPZ.
 
 Expected output shape:
-    X : (num_stations, 8, 60000, 3)
+    X : (num_stations, num_windows, sliding_window_sec * 100, 3)
 """
 
 from pathlib import Path
@@ -22,19 +22,22 @@ from shared.config import WIN, STRIDE
 # =============
 # Config
 # =============
-PAIRS_CSV = PAIRS_TOHOKU_CSV / "tohoku_station_pairs_ver_15km.csv"
+PAIRS_CSV = PAIRS_TOHOKU_CSV / "tohoku_station_pairs_ver_30km.csv"
 TARGET_FS = 100 #upsample to 100 Hz
 
-WIN_SEC = int(WIN)          # 600
-STRIDE_SEC = int(STRIDE)    # 300
+WIN_SEC = int(WIN)          # 480
+STRIDE_SEC = int(STRIDE)    # 240
 
 WIN_SAMPLES = WIN_SEC * TARGET_FS
 STRIDE_SAMPLES = STRIDE_SEC * TARGET_FS
 
-EXPECTED_WINDOWS = 8
+EXPECTED_WINDOWS = 21
 
-OUT_NPZ = GNSS_TOHOKU_PROC / (
-    f"tohoku_gnss_station_seq_{WIN_SEC}s_{STRIDE_SEC}s_{TARGET_FS}hz_from_pairs15km.npz"
+base_dir = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "100hz"
+base_dir.mkdir(parents=True, exist_ok=True)
+
+OUT_NPZ = base_dir / (
+    f"tohoku_gnss_station_seq_{WIN_SEC}s_{STRIDE_SEC}s_{TARGET_FS}hz_from_pairs30km.npz"
 )
 
 STATION_RE = re.compile(r"(GNET\d{4})", re.I)
