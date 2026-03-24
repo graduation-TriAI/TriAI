@@ -11,7 +11,7 @@ from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
 EXPERIMENT = "baseline_2026-03-22"
-DIST_KM = "10km"
+DIST_KM = "15km"
 
 DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
