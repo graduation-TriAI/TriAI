@@ -6,7 +6,7 @@ from shared.paths import GNSS_TOHOKU_PROC
 from shared.config import WIN, STRIDE
 
 EXPERIMENT = "baseline_2026-03-22"
-DIST_KM = "25km"
+DIST_KM = "30km"
 
 LOG_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
 LOG_DIR.mkdir(parents=True, exist_ok=True)
