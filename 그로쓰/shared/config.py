@@ -1,5 +1,5 @@
 # window slicing parameters
-WIN = 240
-STRIDE = 120
+WIN = 480
+STRIDE = 240
 
 GNSS_SAMPLING_RATE = 1.0
