@@ -3,12 +3,26 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, random_split
+from pathlib import Path
+import pandas as pd
 
 from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
+from shared.config import WIN, STRIDE
 
-DATA_PATH = GNSS_TOHOKU_PROC / "tohoku_gnss_pgv_dataset_25km_seq.npz"
-MODEL_SAVE_PATH = GNSS_TOHOKU_PROC / "gnss_pgv_best_15km_y_only_MSE_lr=5e-4.pt"
+EXPERIMENT = "baseline_2026-03-22"
+DIST_KM = "10km"
+
+DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+
+MODEL_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
+LOG_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
+
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+MODEL_SAVE_PATH = MODEL_DIR / "best_1hz.pt"
+LOG_SAVE_PATH = LOG_DIR / f"{DIST_KM}_1hz.csv"
 
 BATCH_SIZE = 8
 EPOCHS = 150 #우선은 30으로 하고 나중에 100으로 늘리기! 100/150
@@ -177,6 +191,14 @@ def main():
         gamma=0.1
     )
 
+    log_epochs = []
+    log_lrs = []
+    log_train_loss = []
+    log_train_rmse = []
+    log_val_loss = []
+    log_val_rmse = []
+    log_val_rmse_orig = []
+
     best_val_rmse_orig = float("inf")
     best_model_weights = None
 
@@ -200,6 +222,14 @@ def main():
             torch.save(best_model_weights, MODEL_SAVE_PATH)
             print("   -> Best model saved")
         
+        log_epochs.append(epoch)
+        log_lrs.append(current_lr)
+        log_train_loss.append(train_loss)
+        log_train_rmse.append(train_rmse)
+        log_val_loss.append(val_loss)
+        log_val_rmse.append(val_rmse)
+        log_val_rmse_orig.append(val_rmse_orig)
+
         print(
             f"Epoch [{epoch:03d}/{EPOCHS}] "
             f"LR: {current_lr:.8f} | "
@@ -213,6 +243,17 @@ def main():
     if best_model_weights is not None:
         model.load_state_dict(best_model_weights)
         
+    log_df = pd.DataFrame({
+        "epoch": log_epochs,
+        "lr": log_lrs,
+        "train_loss": log_train_loss,
+        "train_rmse": log_train_rmse,
+        "val_loss": log_val_loss,
+        "val_rmse": log_val_rmse,
+        "val_rmse_orig": log_val_rmse_orig,
+    })
+    log_df.to_csv(LOG_SAVE_PATH, index=False)
+
     print("\nTraining finished.")
     print("Best Original PGV RMSE:", best_val_rmse_orig)
     print("Best model saved to:", MODEL_SAVE_PATH)
