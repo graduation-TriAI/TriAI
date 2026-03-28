@@ -2,11 +2,11 @@ from shared.paths import GNSS_NOTO_CSV
 import pandas as pd
 
 INPUT_CSV = GNSS_NOTO_CSV / "gnss_stations_sorted_by_distance.csv"
-OUTPUT_CSV = GNSS_NOTO_CSV / "stations_within_250km.csv"
+OUTPUT_CSV = GNSS_NOTO_CSV / "stations_within_260km.csv"
 
 df = pd.read_csv(INPUT_CSV)
 
-df_out = df[df["distance_km"] <= 250].copy()
+df_out = df[df["distance_km"] <= 260].copy()
 
 df_out = df_out.sort_values("distance_km").reset_index(drop=True)
 
