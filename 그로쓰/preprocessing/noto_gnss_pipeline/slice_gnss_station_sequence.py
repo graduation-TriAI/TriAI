@@ -10,18 +10,20 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from shared.paths import GNSS_NOTO_CSV, GNSS_NOTO_PROC
+from shared.paths import GNSS_NOTO_CSV, GNSS_NOTO_PROC, PAIRS_NOTO_CSV
 from shared.config import WIN, STRIDE, GNSS_SAMPLING_RATE as SAMPLING_RATE
 
 
 GNSS_CSV_DIR = GNSS_NOTO_CSV / "enu"
-OUT_PATH = GNSS_NOTO_PROC / f"noto_gnss_station_seq_{WIN}_{STRIDE}.npz"
-STATION_LIST = GNSS_NOTO_CSV / "stations_within_250km.csv"
+base_dir = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" 
+base_dir.mkdir(parents=True, exist_ok=True)
+OUT_PATH = base_dir / f"noto_gnss_station_seq_{WIN}_{STRIDE}.npz"
+STATION_LIST = PAIRS_NOTO_CSV / "noto_station_pairs.csv"
 LATLON_CSV = GNSS_NOTO_CSV / "stations_latlon.csv"
 
 
 stations_df = pd.read_csv(STATION_LIST)
-target_stations = set(stations_df["station"].astype(str).str.upper())
+target_stations = set(stations_df["gnss_station"].astype(str).str.upper())
 print("Number of target stations:", len(target_stations))
 
 
@@ -196,9 +198,9 @@ for csv_file in sorted(GNSS_CSV_DIR.glob("*.csv")):
         print(f"Skipped {station}: too short for one window")
         continue
 
-    if windows.shape[0] != 8:
+    if windows.shape[0] !=14:
         skipped_wrong_windows += 1
-        print(f"Skipped {station}: expected 8 windows, got {windows.shape[0]}")
+        print(f"Skipped {station}: expected 14 windows, got {windows.shape[0]}")
         continue
 
     all_X.append(windows.astype(np.float32))
