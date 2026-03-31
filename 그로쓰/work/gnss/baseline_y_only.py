@@ -10,10 +10,10 @@ from shared.paths import GNSS_TOHOKU_PROC
 from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "baseline_batch_change_2026-03-26"
-DIST_KM = "25km"
+EXPERIMENT = "baseline_noto_2026-03-31"
+DIST_KM = "10km"
 
-DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
 MODEL_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
 LOG_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
@@ -24,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_SAVE_PATH = MODEL_DIR / "best_1hz.pt"
 LOG_SAVE_PATH = LOG_DIR / f"{DIST_KM}_1hz.csv"
 
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 EPOCHS = 150 #우선은 30으로 하고 나중에 100으로 늘리기! 100/150
 LR = 1e-3   #1e-3, 5e-4, 3e-4, 1e-4
 TRAIN_RATIO = 0.8

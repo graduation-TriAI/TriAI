@@ -5,8 +5,8 @@ from pathlib import Path
 from shared.paths import GNSS_TOHOKU_PROC
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "baseline_batch_change_2026-03-26"
-DIST_KM = "25km"
+EXPERIMENT = "baseline_noto_2026-03-31"
+DIST_KM = "10km"
 
 LOG_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
 LOG_DIR.mkdir(parents=True, exist_ok=True)
