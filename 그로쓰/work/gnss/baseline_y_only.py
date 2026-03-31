@@ -6,17 +6,17 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from pathlib import Path
 import pandas as pd
 
-from shared.paths import GNSS_TOHOKU_PROC
+from shared.paths import GNSS_NOTO_PROC
 from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
 EXPERIMENT = "baseline_noto_2026-03-31"
 DIST_KM = "10km"
 
-DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
-MODEL_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
-LOG_DIR = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
+MODEL_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
+LOG_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
 
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
