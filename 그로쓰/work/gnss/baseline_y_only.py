@@ -11,7 +11,7 @@ from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
 EXPERIMENT = "baseline_noto_2026-03-31"
-DIST_KM = "20km"
+DIST_KM = "25km"
 
 DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
