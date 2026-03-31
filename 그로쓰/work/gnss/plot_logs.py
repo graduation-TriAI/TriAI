@@ -6,7 +6,7 @@ from shared.paths import GNSS_NOTO_PROC
 from shared.config import WIN, STRIDE
 
 EXPERIMENT = "baseline_noto_2026-03-31"
-DIST_KM = "25km"
+DIST_KM = "30km"
 
 LOG_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
 LOG_DIR.mkdir(parents=True, exist_ok=True)
