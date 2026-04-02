@@ -20,10 +20,10 @@
 - `tohoku_gnss_pipeline/`  
   도호쿠(Tohoku) 지진 데이터에 대한 GNSS 전처리 파이프라인
 
-- `tohoku_pgv/` 
+- `pgv_pipeline/` 
   지진파 관측소 메타데이터를 기반으로 관측소별 PGV 값을 매칭하고, 데이터 정제를 통해 학습용 라벨 데이터셋을 구축하는 전처리 파이프라인
 
-- `tohoku_seismic/`  
+- `seismic_pipeline/`  
   Hi-net 지진파형 데이터를 수집하고 시계열 윈도우로 분할하여 학습용 데이터셋으로 변환하는 전처리 파이프라인
 
 - `station_pairs.ipynb`  

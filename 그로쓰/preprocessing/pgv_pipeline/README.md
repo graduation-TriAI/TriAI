@@ -1,4 +1,4 @@
-### tohoku_pgv
+### pgv_pipeline
 
 이 디렉토리는 PGV(Peak Ground Velocity) 라벨을 관측소별로 매칭하여 학습용 데이터로 생성하는 전처리 파이프라인의 세부 구현을 포함합니다.
 
