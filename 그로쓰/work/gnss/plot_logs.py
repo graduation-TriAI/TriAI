@@ -2,17 +2,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from shared.paths import GNSS_NOTO_PROC
+from shared.paths import GNSS_CROSS
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "baseline_noto_2026-03-31"
-DIST_KM = "30km"
+EXPERIMENT = "cross_event_tohoku_train_noto_eval_2026-04-03"
+DIST_KM = "25km"
 
-LOG_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
+LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / f"{DIST_KM}_1hz.csv"
 
-PLOT_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "plots" / EXPERIMENT
+PLOT_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "plots" / EXPERIMENT
 PLOT_DIR.mkdir(parents=True, exist_ok=True)
 
 df = pd.read_csv(LOG_PATH)

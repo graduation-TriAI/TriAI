@@ -6,17 +6,18 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from pathlib import Path
 import pandas as pd
 
-from shared.paths import GNSS_NOTO_PROC
+from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_CROSS
 from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "baseline_noto_2026-03-31"
-DIST_KM = "30km"
+EXPERIMENT = "cross_event_tohoku_train_noto_eval_2026-04-03"
+DIST_KM = "25km"
 
-DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TRAIN_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TARGET_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
-MODEL_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
-LOG_DIR = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
+MODEL_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
+LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
 
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -27,7 +28,7 @@ LOG_SAVE_PATH = LOG_DIR / f"{DIST_KM}_1hz.csv"
 BATCH_SIZE = 8
 EPOCHS = 150 #우선은 30으로 하고 나중에 100으로 늘리기! 100/150
 LR = 1e-3   #1e-3, 5e-4, 3e-4, 1e-4
-TRAIN_RATIO = 0.8
+VAL_RATIO = 0.1
 SEED = 42
 
 DROP_LAST = True #이후 True로 바꿔서 실험해 보기
@@ -129,6 +130,33 @@ def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
 
     return avg_loss, rmse, None
 
+def predict(model, loader, device, y_mean, y_std):
+    model.eval()
+
+    all_true = []
+    all_pred = []
+
+    with torch.no_grad():
+        for X, y in loader:
+            X = X.to(device)
+            y = y.to(device).unsqueeze(1)
+
+            pred = model(X)
+
+            y_mean_dev = y_mean.to(device)
+            y_std_dev = y_std.to(device)
+
+            pred_orig = pred * y_std_dev + y_mean_dev
+            y_orig = y * y_std_dev + y_mean_dev
+
+            all_true.append(y_orig.cpu().numpy())
+            all_pred.append(pred_orig.cpu().numpy())
+
+    all_true = np.concatenate(all_true, axis=0).reshape(-1)
+    all_pred = np.concatenate(all_pred, axis=0).reshape(-1)
+
+    return all_true, all_pred
+
 def main():
     torch.manual_seed(SEED)
     np.random.seed(SEED)
@@ -136,35 +164,43 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    dataset = GNSSPGVDataset(DATA_PATH)
-    print("Total samples:", len(dataset))
+    train_base_dataset = GNSSPGVDataset(TRAIN_DATA_PATH)
+    target_base_dataset = GNSSPGVDataset(TARGET_DATA_PATH)
+    
+    print("Train-event total samples:", len(train_base_dataset))
+    print("Target-event total samples:", len(target_base_dataset))
 
-    train_size = int(len(dataset) * TRAIN_RATIO)
-    val_size = len(dataset) - train_size
-
-    train_dataset, val_dataset = random_split(
-        dataset, 
-        [train_size, val_size],
-        generator=torch.Generator().manual_seed(SEED)
-    )
-
-    train_indices = train_dataset.indices
-    val_indices = val_dataset.indices
-
-    y_train = dataset.y[train_indices]
+    y_train = train_base_dataset.y
     y_mean = y_train.mean()
     y_std = y_train.std()
 
     if y_std < 1e-8:
         y_std = torch.tensor(1.0)
 
-    print(f"y_mean: {y_mean.item():.6f}, y_std: {y_std.item():.6f}")
+    print(f"Train y_mean: {y_mean.item():.6f}, y_std: {y_std.item():.6f}")
 
-    train_dataset = NormalizedSubset(dataset, train_indices, y_mean, y_std)
-    val_dataset = NormalizedSubset(dataset, val_indices, y_mean, y_std)
+    train_indices = list(range(len(train_base_dataset)))
+
+    target_size = len(target_base_dataset)
+    val_size = max(1, int(target_size * VAL_RATIO))
+    test_size = target_size - val_size
+
+    val_subset_raw, test_subset_raw = random_split(
+        target_base_dataset,
+        [val_size, test_size],
+        generator=torch.Generator().manual_seed(SEED)
+    )
+
+    val_indices = val_subset_raw.indices
+    test_indices = test_subset_raw.indices
+
+    train_dataset = NormalizedSubset(train_base_dataset, train_indices, y_mean, y_std)
+    val_dataset = NormalizedSubset(target_base_dataset, val_indices, y_mean, y_std)
+    test_dataset = NormalizedSubset(target_base_dataset, test_indices, y_mean, y_std)
 
     print("Train samples:", len(train_dataset))
     print("Val samples:", len(val_dataset))
+    print("Test samples:", len(test_dataset))
 
     train_loader = DataLoader(
         train_dataset,
@@ -175,6 +211,13 @@ def main():
 
     val_loader = DataLoader(
         val_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        drop_last=False
+    )
+
+    test_loader = DataLoader(
+        test_dataset,
         batch_size=BATCH_SIZE,
         shuffle=False,
         drop_last=False
@@ -242,7 +285,31 @@ def main():
 
     if best_model_weights is not None:
         model.load_state_dict(best_model_weights)
-        
+
+    print("\n============================ Test ============================")
+    test_loss, test_rmse, test_rmse_orig = evaluate(
+        model, test_loader, criterion, device, y_mean, y_std
+    )
+
+    y_true_orig, y_pred_orig = predict(
+        model, test_loader, device, y_mean, y_std
+    )
+
+    pred_df = pd.DataFrame({
+        "y_true": y_true_orig,
+        "y_pred": y_pred_orig,
+    })
+    pred_save_path = LOG_DIR / f"{DIST_KM}_test_predictions.csv"
+    pred_df.to_csv(pred_save_path, index=False)
+
+    print(
+        f"Test Loss: {test_loss:.6f} | "
+        f"Test RMSE: {test_rmse:.6f} | "
+        f"Test Original PGV RMSE: {test_rmse_orig:.6f}"
+    )
+
+    print("Test predictions saved to:", pred_save_path)
+
     log_df = pd.DataFrame({
         "epoch": log_epochs,
         "lr": log_lrs,
@@ -256,6 +323,7 @@ def main():
 
     print("\nTraining finished.")
     print("Best Original PGV RMSE:", best_val_rmse_orig)
+    print("Test Original PGV RMSE:", test_rmse_orig)
     print("Best model saved to:", MODEL_SAVE_PATH)
 
     return model
