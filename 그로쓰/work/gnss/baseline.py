@@ -28,7 +28,7 @@ LOG_SAVE_PATH = LOG_DIR / f"{DIST_KM}_1hz.csv"
 BATCH_SIZE = 8
 EPOCHS = 150 #우선은 30으로 하고 나중에 100으로 늘리기! 100/150
 LR = 1e-3   #1e-3, 5e-4, 3e-4, 1e-4
-VAL_RATIO = 0.1
+VAL_RATIO = 0.2
 SEED = 42
 
 DROP_LAST = True #이후 True로 바꿔서 실험해 보기
@@ -60,7 +60,8 @@ class NormalizedSubset(Dataset):
     def __getitem__(self, idx):
         real_idx = self.indices[idx]
         x, y = self.base_dataset[real_idx]
-        y_norm = (y - self.y_mean) / self.y_std
+        y_log = torch.log1p(y)
+        y_norm = (y_log - self.y_mean) / self.y_std
         return x, y_norm
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
@@ -115,8 +116,11 @@ def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
             total_sq_error += torch.sum((pred - y) ** 2).item()
 
             if y_mean is not None and y_std is not None:
-                pred_orig = pred * y_std.to(device) + y_mean.to(device)
-                y_orig = y * y_std.to(device) + y_mean.to(device)
+                pred_log = pred * y_std.to(device) + y_mean.to(device)
+                y_log = y * y_std.to(device) + y_mean.to(device)
+
+                pred_orig = torch.expm1(pred_log)
+                y_orig = torch.expm1(y_log)
                 total_sq_error_orig += torch.sum((pred_orig - y_orig) ** 2).item()
 
             total_count += batch_size
@@ -146,8 +150,11 @@ def predict(model, loader, device, y_mean, y_std):
             y_mean_dev = y_mean.to(device)
             y_std_dev = y_std.to(device)
 
-            pred_orig = pred * y_std_dev + y_mean_dev
-            y_orig = y * y_std_dev + y_mean_dev
+            pred_log = pred * y_std_dev + y_mean_dev
+            y_log = y * y_std_dev + y_mean_dev
+
+            pred_orig = torch.expm1(pred_log)
+            y_orig = torch.expm1(y_log)
 
             all_true.append(y_orig.cpu().numpy())
             all_pred.append(pred_orig.cpu().numpy())
@@ -170,9 +177,9 @@ def main():
     print("Train-event total samples:", len(train_base_dataset))
     print("Target-event total samples:", len(target_base_dataset))
 
-    y_train = train_base_dataset.y
-    y_mean = y_train.mean()
-    y_std = y_train.std()
+    y_train_log = torch.log1p(train_base_dataset.y)
+    y_mean = y_train_log.mean()
+    y_std = y_train_log.std()
 
     if y_std < 1e-8:
         y_std = torch.tensor(1.0)
