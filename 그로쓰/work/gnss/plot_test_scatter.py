@@ -6,7 +6,7 @@ from pathlib import Path
 from shared.paths import GNSS_CROSS
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "tuning_weighted_loss2_tohoku_train_2026-04-04"
+EXPERIMENT = "tuning_weighted_loss2_noto_train_2026-04-04"
 DIST_KM = "25km"
 
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
