@@ -10,11 +10,11 @@ from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_CROSS
 from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "tuning_weighted_loss_tohoku_train_2026-04-04"
+EXPERIMENT = "tuning_weighted_loss_noto_train_2026-04-04"
 DIST_KM = "25km"
 
-TRAIN_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
-TARGET_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TARGET_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TRAIN_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
 MODEL_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
