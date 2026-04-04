@@ -10,11 +10,11 @@ from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_CROSS
 from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "cross_event_noto_train_tohoku_eval_2026-04-03"
+EXPERIMENT = "tuning_weighted_loss_tohoku_train_2026-04-04"
 DIST_KM = "25km"
 
-TARGET_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
-TRAIN_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TRAIN_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TARGET_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
 MODEL_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
@@ -32,6 +32,16 @@ VAL_RATIO = 0.2
 SEED = 42
 
 DROP_LAST = True #이후 True로 바꿔서 실험해 보기
+
+LOW_PGV_TH = 10.0
+MID_PGV_TH = 20.0
+
+LOW_WEIGHT = 1.0
+MID_WEIGHT = 2.0
+HIGH_WEIGHT = 4.0
+
+#Train Loss/Val Loss -> Weighted
+#Train RMSE/Val RMSE -> unweighted
 
 class GNSSPGVDataset(Dataset):
     def __init__(self, npz_path):
@@ -59,34 +69,35 @@ class NormalizedSubset(Dataset):
 
     def __getitem__(self, idx):
         real_idx = self.indices[idx]
-        x, y = self.base_dataset[real_idx]
-        y_log = torch.log1p(y)
+        x, y_orig = self.base_dataset[real_idx]
+        y_log = torch.log1p(y_orig)
         y_norm = (y_log - self.y_mean) / self.y_std
-        return x, y_norm
+        return x, y_norm, y_orig
 
-def train_one_epoch(model, loader, criterion, optimizer, device):
+def train_one_epoch(model, loader, optimizer, device):
     model.train()
 
     total_loss = 0.0
     total_sq_error = 0.0
     total_count = 0
 
-    for X, y in loader:
+    for X, y_norm, y_orig in loader:
         X = X.to(device)
-        y = y.to(device).unsqueeze(1)
+        y_norm = y_norm.to(device).unsqueeze(1)
+        y_orig = y_orig.to(device).unsqueeze(1)
 
         optimizer.zero_grad()
 
         pred = model(X)
-        loss = criterion(pred, y)
-
+        weights = get_sample_weights(y_orig)
+        loss = weighted_mse_loss(pred, y_norm, weights)
         loss.backward()
         optimizer.step()
 
         batch_size = X.size(0)
 
         total_loss += loss.item() * batch_size
-        total_sq_error += torch.sum((pred - y) ** 2).item()
+        total_sq_error += torch.sum((pred - y_norm) ** 2).item()
         total_count += batch_size
 
     avg_loss = total_loss / total_count
@@ -94,7 +105,7 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
 
     return avg_loss, rmse
 
-def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
+def evaluate(model, loader, device, y_mean=None, y_std=None):
     model.eval()
 
     total_loss = 0.0
@@ -103,25 +114,27 @@ def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
     total_count = 0
 
     with torch.no_grad():
-        for X, y in loader:
+        for X, y_norm, y_orig in loader:
             X = X.to(device)
-            y = y.to(device).unsqueeze(1)
+            y_norm = y_norm.to(device).unsqueeze(1)
+            y_orig = y_orig.to(device).unsqueeze(1)
 
             pred = model(X)
-            loss = criterion(pred, y)
+            weights = get_sample_weights(y_orig)
+            loss = weighted_mse_loss(pred, y_norm, weights)
 
             batch_size = X.size(0)
 
             total_loss += loss.item() * batch_size
-            total_sq_error += torch.sum((pred - y) ** 2).item()
+            total_sq_error += torch.sum((pred - y_norm) ** 2).item()
 
             if y_mean is not None and y_std is not None:
                 pred_log = pred * y_std.to(device) + y_mean.to(device)
-                y_log = y * y_std.to(device) + y_mean.to(device)
+                y_log = y_norm * y_std.to(device) + y_mean.to(device)
 
                 pred_orig = torch.expm1(pred_log)
-                y_orig = torch.expm1(y_log)
-                total_sq_error_orig += torch.sum((pred_orig - y_orig) ** 2).item()
+                y_orig_restored = torch.expm1(y_log)
+                total_sq_error_orig += torch.sum((pred_orig - y_orig_restored) ** 2).item()
 
             total_count += batch_size
 
@@ -141,9 +154,9 @@ def predict(model, loader, device, y_mean, y_std):
     all_pred = []
 
     with torch.no_grad():
-        for X, y in loader:
+        for X, y_norm, y_orig in loader:
             X = X.to(device)
-            y = y.to(device).unsqueeze(1)
+            y_norm = y_norm.to(device).unsqueeze(1)
 
             pred = model(X)
 
@@ -151,18 +164,37 @@ def predict(model, loader, device, y_mean, y_std):
             y_std_dev = y_std.to(device)
 
             pred_log = pred * y_std_dev + y_mean_dev
-            y_log = y * y_std_dev + y_mean_dev
+            y_log = y_norm * y_std_dev + y_mean_dev
 
             pred_orig = torch.expm1(pred_log)
-            y_orig = torch.expm1(y_log)
+            y_orig_restored = torch.expm1(y_log)
 
-            all_true.append(y_orig.cpu().numpy())
+            all_true.append(y_orig_restored.cpu().numpy())
             all_pred.append(pred_orig.cpu().numpy())
 
     all_true = np.concatenate(all_true, axis=0).reshape(-1)
     all_pred = np.concatenate(all_pred, axis=0).reshape(-1)
 
     return all_true, all_pred
+
+def get_sample_weights(y_orig: torch.Tensor) -> torch.Tensor:
+    weights = torch.full_like(y_orig, LOW_WEIGHT)
+
+    weights = torch.where(
+        (y_orig >= LOW_PGV_TH) & (y_orig < MID_PGV_TH),
+        torch.full_like(y_orig, MID_WEIGHT),
+        weights
+    )
+    weights = torch.where(
+        y_orig >= MID_PGV_TH,
+        torch.full_like(y_orig, HIGH_WEIGHT),
+        weights
+    )
+    return weights
+
+
+def weighted_mse_loss(pred: torch.Tensor, target: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
+    return (weights * (pred - target) ** 2).mean()
 
 def main():
     torch.manual_seed(SEED)
@@ -232,7 +264,6 @@ def main():
 
     model = GNSSModel().to(device)
 
-    criterion = nn.MSELoss()    #MSELoss() -> SmoothL1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-5)
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(
@@ -257,11 +288,11 @@ def main():
     #Training Loop
     for epoch in range(1, EPOCHS + 1):
         train_loss, train_rmse = train_one_epoch(
-            model, train_loader, criterion, optimizer, device
+            model, train_loader, optimizer, device
         )
 
         val_loss, val_rmse, val_rmse_orig = evaluate(
-            model, val_loader, criterion, device, y_mean, y_std
+            model, val_loader, device, y_mean, y_std
         )
 
         current_lr = optimizer.param_groups[0]["lr"]
@@ -295,7 +326,7 @@ def main():
 
     print("\n============================ Test ============================")
     test_loss, test_rmse, test_rmse_orig = evaluate(
-        model, test_loader, criterion, device, y_mean, y_std
+        model, test_loader, device, y_mean, y_std
     )
 
     y_true_orig, y_pred_orig = predict(

@@ -5,7 +5,7 @@ from pathlib import Path
 from shared.paths import GNSS_CROSS
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "cross_event_noto_train_tohoku_eval_2026-04-03"
+EXPERIMENT = "tuning_weighted_loss_tohoku_train_2026-04-04"
 DIST_KM = "25km"
 
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
@@ -22,8 +22,8 @@ plt.figure(figsize=(8, 5))
 plt.plot(df["epoch"], df["train_loss"], label="Train Loss")
 plt.plot(df["epoch"], df["val_loss"], label="Val Loss")
 plt.xlabel("Epoch")
-plt.ylabel("Loss (log+z-score space)")
-plt.title(f"{DIST_KM} | WIN={WIN}, STRIDE={STRIDE} | Loss")
+plt.ylabel("Weighted Loss (log+z-score space)")
+plt.title(f"{DIST_KM} | WIN={WIN}, STRIDE={STRIDE} | Weighted Loss")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
@@ -32,9 +32,9 @@ plt.show()
 
 # 2. RMSE graph
 plt.figure(figsize=(8, 5))
-plt.plot(df["epoch"], df["train_rmse"], label="Train RMSE (log+z)")
-plt.plot(df["epoch"], df["val_rmse"], label="Val RMSE (log+z)")
-plt.plot(df["epoch"], df["val_rmse_orig"], label="Val Original PGV RMSE")
+plt.plot(df["epoch"], df["train_rmse"], label="Train RMSE (unweighted, log+z)")
+plt.plot(df["epoch"], df["val_rmse"], label="Val RMSE (unweighted, log+z)")
+plt.plot(df["epoch"], df["val_rmse_orig"], label="Val RMSE (unweighted, original PGV)")
 plt.xlabel("Epoch")
 plt.ylabel("RMSE")
 plt.title(f"{DIST_KM} | WIN={WIN}, STRIDE={STRIDE} | RMSE")
