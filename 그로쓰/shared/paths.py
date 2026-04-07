@@ -24,6 +24,7 @@ CSV_GNSS = CSV / "gnss"
 CSV_SEIS = CSV / "seismic"
 CSV_SAMPLES = CSV / "samples"
 CSV_PAIRS = CSV / "station_pairs"
+CSV_POST = CSV / "postprocessing"
 
 #events
 TOHOKU = "tohoku"
