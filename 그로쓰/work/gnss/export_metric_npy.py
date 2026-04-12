@@ -5,11 +5,11 @@ from pathlib import Path
 from shared.paths import GNSS_CROSS
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "cross_event_npy_weighted_mse_alpha=0.1_tohoku_train_2026-04-12"
+EXPERIMENT = "cross_event_npy_weighted_mse_alpha=0.1_noto_train_2026-04-12"
 DIST_KM = "25km"
 
 LOG_CSV_PATH = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT / f"{DIST_KM}_1hz.csv"
-NPY_SAVE_PATH = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT / f"{DIST_KM}_metric.npy"
+NPY_SAVE_PATH = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT / f"{WIN}_{STRIDE}_{DIST_KM}_metric.npy"
 
 def main():
     df = pd.read_csv(LOG_CSV_PATH)
