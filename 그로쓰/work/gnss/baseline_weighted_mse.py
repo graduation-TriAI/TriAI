@@ -10,11 +10,11 @@ from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_CROSS
 from work.gnss.model import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "cross_event_weighted_mse_alpha=0.05_noto_train_2026-04-12"
+EXPERIMENT = "cross_event_weighted_mse_alpha=0.1_tohoku_train_2026-04-12"
 DIST_KM = "25km"
 
-TARGET_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
-TRAIN_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TRAIN_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TARGET_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
 MODEL_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
@@ -64,7 +64,7 @@ class NormalizedSubset(Dataset):
         y_norm = (y_log - self.y_mean) / self.y_std
         return x, y_norm
 
-def weighted_mse_loss(pred, target, y_mean, y_std, alpha=0.05):
+def weighted_mse_loss(pred, target, y_mean, y_std, alpha=0.1):
     """
     Weighted MSE where larger original PGV gets a larger weight.
     pred and target are in normalized space.
@@ -251,7 +251,7 @@ def main():
     model = GNSSModel().to(device)
 
     criterion = lambda pred, target: weighted_mse_loss(
-        pred, target, y_mean, y_std, alpha=0.05
+        pred, target, y_mean, y_std, alpha=0.1
     )
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-5)
