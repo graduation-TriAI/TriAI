@@ -18,7 +18,7 @@ def main():
         "epoch": df["epoch"].to_numpy(),
         "train_loss": df["train_loss"].to_numpy(),
         "test_loss": df["test_loss"].to_numpy(),
-        "test_rmse": df["test_rmse"].to_numpy(),
+        "test_rmse": df["test_rmse_orig"].to_numpy(),
         "lr": df["lr"].to_numpy(),
     }
 
