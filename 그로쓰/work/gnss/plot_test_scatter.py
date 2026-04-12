@@ -6,7 +6,7 @@ from pathlib import Path
 from shared.paths import GNSS_CROSS
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "cross_event_noto_train_tohoku_eval_2026-04-03"
+EXPERIMENT = "cross_event_tohoku_train_noto_test_2026-04-12"
 DIST_KM = "25km"
 
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
@@ -14,41 +14,73 @@ PLOT_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "plots" / EXPERIMENT
 PLOT_DIR.mkdir(parents=True, exist_ok=True)
 
 PRED_PATH = LOG_DIR / f"{DIST_KM}_test_predictions.csv"
+SAVE_PATH = PLOT_DIR / f"{DIST_KM}_test_scatter.png"
 
 df = pd.read_csv(PRED_PATH)
 
-y_true = df["y_true"].values
-y_pred = df["y_pred"].values
+y_true = df["y_true"].to_numpy()
+y_pred = df["y_pred"].to_numpy()
 
 rmse = np.sqrt(np.mean((y_true - y_pred) ** 2))
 
-min_val = min(y_true.min(), y_pred.min())
-max_val = max(y_true.max(), y_pred.max())
+# 예시 코드 느낌 맞추기: 축 범위 고정
+max_val = 100
 
-# 예: ±20% 범위
-lower_20 = y_true * 0.8
-upper_20 = y_true * 1.2
-within_20 = ((y_pred >= lower_20) & (y_pred <= upper_20)).mean() * 100
+plt.figure(figsize=(10, 10))
+plt.scatter(
+    y_true,
+    y_pred,
+    alpha=0.5,
+    color="dodgerblue",
+    edgecolor="k",
+    s=50,
+)
 
-plt.figure(figsize=(7, 7))
-plt.scatter(y_true, y_pred, alpha=0.5, s=10)
+# Perfect prediction line
+plt.plot(
+    [0, max_val],
+    [0, max_val],
+    color="red",
+    linestyle="--",
+    linewidth=2,
+    label="Perfect Prediction (y=x)",
+)
 
-# y=x
-plt.plot([min_val, max_val], [min_val, max_val])
+# ±10 error lines
+plt.plot(
+    [0, max_val],
+    [10, max_val + 10],
+    color="gray",
+    linestyle=":",
+    alpha=0.7,
+    label="+10 Error",
+)
+plt.plot(
+    [0, max_val],
+    [-10, max_val - 10],
+    color="gray",
+    linestyle=":",
+    alpha=0.7,
+    label="-10 Error",
+)
 
-# ±20% lines
-plt.plot([min_val, max_val], [min_val * 1.2, max_val * 1.2], linestyle="--")
-plt.plot([min_val, max_val], [min_val * 0.8, max_val * 0.8], linestyle="--")
+plt.title(
+    f"[{WIN}_{STRIDE}] Best Model: Actual vs Predicted (Original Scale)\nRMSE: {rmse:.4f}",
+    fontsize=16,
+    fontweight="bold",
+    pad=15,
+)
+plt.xlabel("Actual PGV", fontsize=14)
+plt.ylabel("Predicted PGV", fontsize=14)
 
-plt.xlim(min_val, max_val)
-plt.ylim(min_val, max_val)
-plt.gca().set_aspect('equal', adjustable='box')
-
-plt.xlabel("True PGV")
-plt.ylabel("Predicted PGV")
-plt.title(f"{DIST_KM} Test Scatter\n"
-          f"RMSE: {rmse: 2f}, Within ±20%: {within_20:.2f}%")
-plt.grid(True)
+plt.xlim(0, max_val)
+plt.ylim(0, max_val)
+plt.gca().set_aspect("equal", adjustable="box")
+plt.grid(True, linestyle="--", alpha=0.6)
+plt.legend(fontsize=12)
 plt.tight_layout()
-plt.savefig(PLOT_DIR / f"{DIST_KM}_test_scatter.png")
+
+plt.savefig(SAVE_PATH, dpi=300)
 plt.show()
+
+print(f"Saved to: {SAVE_PATH}")
