@@ -84,3 +84,5 @@ plt.savefig(SAVE_PATH, dpi=300)
 plt.show()
 
 print(f"Saved to: {SAVE_PATH}")
+
+print(y_true[:5], y_pred[:5])
