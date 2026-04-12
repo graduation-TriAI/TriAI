@@ -86,3 +86,5 @@ plt.show()
 print(f"Saved to: {SAVE_PATH}")
 
 print(y_true[:5], y_pred[:5])
+print(df["y_pred"].describe())
+print(df.sort_values("y_pred", ascending=False).head(10))

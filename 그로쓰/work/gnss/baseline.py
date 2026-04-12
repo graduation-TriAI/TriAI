@@ -153,6 +153,9 @@ def predict(model, loader, device, y_mean, y_std):
             pred_log = pred * y_std_dev + y_mean_dev
             y_log = y * y_std_dev + y_mean_dev
 
+            print("pred min/max:", pred.min().item(), pred.max().item())
+            print("pred_log min/max:", pred_log.min().item(), pred_log.max().item())
+
             pred_orig = torch.expm1(pred_log)
             y_orig = torch.expm1(y_log)
 
