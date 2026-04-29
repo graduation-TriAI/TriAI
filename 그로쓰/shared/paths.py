@@ -11,6 +11,7 @@ WORK = ROOT / "work"
 RAW = DATA / "raw"
 PROCESSED = DATA / "processed"
 CSV = DATA / "csv"
+POST = DATA / "postprocessing"
 
 #modalities
 RAW_GNSS = RAW / "gnss"
@@ -24,7 +25,6 @@ CSV_GNSS = CSV / "gnss"
 CSV_SEIS = CSV / "seismic"
 CSV_SAMPLES = CSV / "samples"
 CSV_PAIRS = CSV / "station_pairs"
-CSV_POST = CSV / "postprocessing"
 
 #events
 TOHOKU = "tohoku"

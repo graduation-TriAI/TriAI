@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 from pykrige.ok import OrdinaryKriging
 
-from shared.paths import CSV_POST
+from shared.paths import POST
 
-INPUT_CSV_PATH = CSV_POST / "tohoku_pred_for_kriging.csv"
-OUTPUT_GRID_CSV = CSV_POST / "tohoku_kriging_pred_grid.csv"
+INPUT_CSV_PATH = POST / "tohoku_pred_for_kriging_ground_truth.csv"
+OUTPUT_GRID_CSV = POST / "tohoku_kriging_pred_grid_ground_truth_0.02.csv"
 
 GRID_RES = 0.02
 MARGIN = 0.2
