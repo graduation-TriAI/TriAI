@@ -4,8 +4,8 @@ from pykrige.ok import OrdinaryKriging
 
 from shared.paths import POST
 
-INPUT_CSV_PATH = POST / "tohoku_pred_for_kriging_ground_truth.csv"
-OUTPUT_GRID_CSV = POST / "tohoku_kriging_pred_grid_ground_truth_0.02.csv"
+INPUT_CSV_PATH = POST / "noto_pred_for_kriging_25km_360_180.csv"
+OUTPUT_GRID_CSV = POST / "noto_kriging_pred_25km_360_180.csv"
 
 GRID_RES = 0.02
 MARGIN = 0.2

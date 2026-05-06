@@ -1,12 +1,12 @@
 import pandas as pd
-from shared.paths import PAIRS_TOHOKU_CSV, POST
+from shared.paths import PAIRS_NOTO_CSV, POST
 
 #seismic_station, pgv_pred 가 저장된 csv 파일
-PRED_CSV_PATH = POST / "tohoku_predicted_pgv_sample.csv"
+PRED_CSV_PATH = POST / "noto_predicted_pgv_25km_360_180.csv"
 
-META_CSV_PATH = PAIRS_TOHOKU_CSV / "tohoku_station_pairs.csv"
+META_CSV_PATH = PAIRS_NOTO_CSV / "noto_station_pairs.csv"
 
-OUTPUT_CSV_PATH = POST / "tohoku_pred_for_kriging_ground_truth.csv"
+OUTPUT_CSV_PATH = POST / "noto_pred_for_kriging_25km_360_180.csv"
 
 AGG_FUNC = "mean"
 
