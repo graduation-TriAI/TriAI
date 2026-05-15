@@ -1,13 +1,13 @@
-from shared.paths import GNSS_NOTO_CSV
+from shared.paths import GNSS_HOKKAIDO_CSV
 import pandas as pd
 import numpy as np
 
-INPUT_CSV = GNSS_NOTO_CSV / "stations_latlon.csv"
-OUTPUT_CSV = GNSS_NOTO_CSV / "gnss_stations_sorted_by_distance.csv"
+INPUT_CSV = GNSS_HOKKAIDO_CSV / "stations_latlon.csv"
+OUTPUT_CSV = GNSS_HOKKAIDO_CSV / "gnss_stations_sorted_by_distance.csv"
 
-#Epicenter coordinates (lat, lon) for the 2024 Noto earthquake
-NOTO_LAT = 37.495
-NOTO_LON = 137.270
+# Epicenter coordinates (lat, lon) for the 2018 Hokkaido Eastern Iburi earthquake
+HOKKAIDO_LAT = 42.690
+HOKKAIDO_LON = 142.007
 
 def haversine(lat1, lon1, lat2, lon2):
     """Return great-circle distance in km between (lat1, lon1) and (lat2, lon2)."""
@@ -28,8 +28,8 @@ df = pd.read_csv(INPUT_CSV)
 df["distance_km"] = haversine(
     df["latitude"],
     df["longitude"],
-    NOTO_LAT,
-    NOTO_LON
+    HOKKAIDO_LAT,
+    HOKKAIDO_LON
 )
 
 df_sorted = df.sort_values("distance_km").reset_index(drop=True)

@@ -1,15 +1,16 @@
 import math
 from pathlib import Path
+
 import pandas as pd
 import numpy as np
 
-from shared.paths import GNSS_KUMAMOTO_CSV, GNSS_KUMAMOTO_RAW
+from shared.paths import GNSS_HOKKAIDO_CSV, GNSS_HOKKAIDO_RAW
 
 # =========================
 # paths
 # =========================
-input_dir = GNSS_KUMAMOTO_RAW / "ppp_outputs"  # 24개 *_ppp_ecef.txt 있는 폴더
-output_dir = GNSS_KUMAMOTO_CSV / "kumamoto_enu_45min"
+input_dir = GNSS_HOKKAIDO_RAW / "hokkaido_ecef_txt"
+output_dir = GNSS_HOKKAIDO_CSV / "hokkaido_enu_45min"
 output_dir.mkdir(parents=True, exist_ok=True)
 
 # =========================
@@ -17,15 +18,14 @@ output_dir.mkdir(parents=True, exist_ok=True)
 # =========================
 LEAP_SECONDS_2016 = 17
 
-# Kumamoto mainshock UTC
-origin_time = pd.Timestamp("2016-04-15 16:25:06")
-origin_minute = origin_time.floor("min")   # 2016-04-15 16:25:00
+# Hokkaido Eastern Iburi mainshock UTC
+origin_time = pd.Timestamp("2018-09-05 18:07:59")
 
-# Match Noto-style window: approx. 16 min before, 29 min after
-start_time = origin_minute - pd.Timedelta(minutes=16)
-end_time = origin_minute + pd.Timedelta(minutes=29)
+# 정확히 origin_time 기준 16분 전 ~ 29분 후
+start_time = (origin_time - pd.Timedelta(minutes=16)).floor("min")
+end_time = (origin_time + pd.Timedelta(minutes=29)).floor("min")
 
-print("Origin minute:", origin_minute)
+print("Origin time:", origin_time)
 print("Cut start:", start_time)
 print("Cut end:", end_time)
 
@@ -44,12 +44,9 @@ def ecef_to_geodetic(x, y, z):
     p = math.sqrt(x**2 + y**2)
     theta = math.atan2(z * A, p * B)
 
-    sin_theta = math.sin(theta)
-    cos_theta = math.cos(theta)
-
     lat = math.atan2(
-        z + EP2 * B * sin_theta**3,
-        p - E2 * A * cos_theta**3
+        z + EP2 * B * math.sin(theta) ** 3,
+        p - E2 * A * math.cos(theta) ** 3
     )
 
     sin_lat = math.sin(lat)
@@ -83,65 +80,39 @@ def ecef_to_enu(x, y, z, x0, y0, z0, lat0_deg, lon0_deg):
 
     return east, north, up
 
-def remove_linear_trend(series: pd.Series) -> pd.Series:
+
+def robust_smooth_detrend(out_df: pd.DataFrame, window_sec: int = 301) -> pd.DataFrame:
     """
-    Linear detrend without scipy.
-    y_detrended = y - fitted_linear_trend
-    """
-    y = series.astype(float).to_numpy()
-    x = list(range(len(y)))
-
-    if len(y) < 2:
-        return series
-
-    x_mean = sum(x) / len(x)
-    y_mean = y.mean()
-
-    denom = sum((xi - x_mean) ** 2 for xi in x)
-    if denom == 0:
-        return series - y_mean
-
-    slope = sum((xi - x_mean) * (yi - y_mean) for xi, yi in zip(x, y)) / denom
-    intercept = y_mean - slope * x_mean
-
-    trend = [slope * xi + intercept for xi in x]
-    return pd.Series(y - trend, index=series.index)
-
-
-def polynomial_pre_event_detrend(out_df: pd.DataFrame, degree: int = 3) -> pd.DataFrame:
-    """
-    Remove nonlinear PPP convergence drift.
-    Fit polynomial trend using pre-event interval only,
-    subtract it from the whole 45-min window,
-    then re-zero using first 60 seconds.
+    PPP drift가 큰 경우용.
+    전체 45분 ENU에서 rolling median trend를 추정해서 제거한 뒤,
+    첫 60초 평균으로 다시 zero-centering.
     """
     cols = ["East [cm]", "North [cm]", "Up [cm]"]
 
     out_df = out_df.copy()
     dt = pd.to_datetime(out_df["Date/Time"], format="%Y/%m/%d %H:%M:%S")
 
-    # seconds from start of window
-    t = (dt - dt.iloc[0]).dt.total_seconds().to_numpy()
-
-    # use only pre-event data for drift fitting
-    pre_mask = dt < origin_time
-
-    if pre_mask.sum() < degree + 2:
-        raise ValueError("Not enough pre-event rows for polynomial detrend")
-
-    t_pre = t[pre_mask]
-
     for col in cols:
-        y = out_df[col].astype(float).to_numpy()
-        y_pre = y[pre_mask]
+        y = out_df[col].astype(float)
 
-        coeff = np.polyfit(t_pre, y_pre, deg=degree)
-        trend = np.polyval(coeff, t)
+        # 5분 정도의 smooth trend 추정
+        trend = (
+            y.rolling(window=window_sec, center=True, min_periods=30)
+             .median()
+             .interpolate(limit_direction="both")
+        )
 
         out_df[col] = y - trend
 
-    # re-zero using first 60 sec
-    baseline = out_df.loc[:59, cols].mean()
+    # 첫 60초 평균을 0으로 맞춤
+    baseline_mask = (
+        dt >= dt.iloc[0]
+    ) & (
+        dt < dt.iloc[0] + pd.Timedelta(seconds=60)
+    )
+
+    baseline = out_df.loc[baseline_mask, cols].mean()
+
     for col in cols:
         out_df[col] = out_df[col] - baseline[col]
 
@@ -159,7 +130,6 @@ def load_ppp_ecef_file(file_path: Path) -> pd.DataFrame:
 
             parts = line.split()
 
-            # format:
             # gps_week gps_seconds x y z Q ns ...
             if len(parts) < 7:
                 continue
@@ -185,7 +155,6 @@ def load_ppp_ecef_file(file_path: Path) -> pd.DataFrame:
         columns=["gps_week", "gps_seconds", "X", "Y", "Z", "Q", "ns"]
     )
 
-    # GPS epoch: 1980-01-06 00:00:00 GPST
     gps_epoch = pd.Timestamp("1980-01-06 00:00:00")
 
     df["datetime_gpst"] = (
@@ -203,24 +172,40 @@ def load_ppp_ecef_file(file_path: Path) -> pd.DataFrame:
 def convert_one_station(file_path: Path):
     df = load_ppp_ecef_file(file_path)
 
-    # PPP만 사용
+    q_counts = df["Q"].value_counts().sort_index().to_dict()
+    print(f"\n[{file_path.name}] Q counts:", q_counts)
+
+    # PPP solution만 사용
     df = df[df["Q"] == 6].copy()
 
     if df.empty:
         raise ValueError(f"No PPP rows Q=6 in {file_path.name}")
 
-    # reference = pre-event average
-    # reference = cut window 시작 후 1분 평균
-    ref_start = start_time
-    ref_end = start_time + pd.Timedelta(minutes=1)
+    # 시간 정렬
+    df = df.sort_values("datetime_utc").reset_index(drop=True)
 
-    ref_df = df[
-        (df["datetime_utc"] >= ref_start) &
-        (df["datetime_utc"] < ref_end)
+    # 45-min window 먼저 자르기
+    window_mask = (
+        (df["datetime_utc"] >= start_time)
+        & (df["datetime_utc"] <= end_time)
+    )
+
+    df_win = df.loc[window_mask].copy().reset_index(drop=True)
+
+    if df_win.empty:
+        raise ValueError(f"No rows in 45-min window: {file_path.name}")
+
+    # reference = window 시작 후 첫 60초 평균
+    ref_start = start_time
+    ref_end = start_time + pd.Timedelta(seconds=60)
+
+    ref_df = df_win[
+        (df_win["datetime_utc"] >= ref_start)
+        & (df_win["datetime_utc"] < ref_end)
     ].copy()
 
     if ref_df.empty:
-        raise ValueError(f"No reference rows in {file_path.name}")
+        raise ValueError(f"No reference rows in first 60 sec: {file_path.name}")
 
     x0 = ref_df["X"].mean()
     y0 = ref_df["Y"].mean()
@@ -232,7 +217,7 @@ def convert_one_station(file_path: Path):
     north_cm = []
     up_cm = []
 
-    for _, row in df.iterrows():
+    for _, row in df_win.iterrows():
         e_m, n_m, u_m = ecef_to_enu(
             row["X"], row["Y"], row["Z"],
             x0, y0, z0,
@@ -243,30 +228,22 @@ def convert_one_station(file_path: Path):
         up_cm.append(u_m * 100.0)
 
     out_df = pd.DataFrame({
-        "Date/Time": df["datetime_utc"].dt.strftime("%Y/%m/%d %H:%M:%S"),
+        "Date/Time": df_win["datetime_utc"].dt.strftime("%Y/%m/%d %H:%M:%S"),
         "Latitude": lat0,
         "Longitude": lon0,
         "Height [m]": h0,
         "East [cm]": east_cm,
         "North [cm]": north_cm,
         "Up [cm]": up_cm,
-        "Q": df["Q"].values,
-        "ns": df["ns"].values,
+        "Q": df_win["Q"].values,
+        "ns": df_win["ns"].values,
     })
 
-    # 45-min window, minute-boundary 기준
-    mask = (
-        (df["datetime_utc"] >= start_time)
-        & (df["datetime_utc"] <= end_time)
-    )
-
-    out_df = out_df.loc[mask].reset_index(drop=True)
-
-    # Remove PPP drift and re-zero baseline
-    out_df = polynomial_pre_event_detrend(out_df, degree=3)
+    out_df = robust_smooth_detrend(out_df, window_sec=301)
 
     station_name = file_path.stem.replace("_ppp_ecef", "")
     output_file = output_dir / f"{station_name}_enu_45min.csv"
+
     out_df.to_csv(output_file, index=False)
 
     print(
@@ -275,9 +252,10 @@ def convert_one_station(file_path: Path):
     )
 
 
+# 한 폴더 안의 *_ppp_ecef.txt만 처리
 file_list = sorted(input_dir.glob("*_ppp_ecef.txt"))
 
-print(f"Found {len(file_list)} PPP ECEF files")
+print(f"\nFound {len(file_list)} PPP ECEF files")
 
 success = 0
 failed = 0
