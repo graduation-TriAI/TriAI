@@ -10,16 +10,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from shared.paths import GNSS_NOTO_CSV, GNSS_NOTO_PROC, PAIRS_NOTO_CSV
+from shared.paths import GNSS_HOKKAIDO_CSV, GNSS_HOKKAIDO_PROC, PAIRS_HOKKAIDO_CSV
 from shared.config import WIN, STRIDE, GNSS_SAMPLING_RATE as SAMPLING_RATE
 
 
-GNSS_CSV_DIR = GNSS_NOTO_CSV / "enu"
-base_dir = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" 
+GNSS_CSV_DIR = GNSS_HOKKAIDO_CSV / "hokkaido_enu_45min"
+base_dir = GNSS_HOKKAIDO_PROC / f"{WIN}_{STRIDE}" 
 base_dir.mkdir(parents=True, exist_ok=True)
-OUT_PATH = base_dir / f"noto_gnss_station_seq_{WIN}_{STRIDE}.npz"
-STATION_LIST = PAIRS_NOTO_CSV / "noto_station_pairs.csv"
-LATLON_CSV = GNSS_NOTO_CSV / "stations_latlon.csv"
+OUT_PATH = base_dir / f"hokkaido_gnss_station_seq_{WIN}_{STRIDE}.npz"
+STATION_LIST = PAIRS_HOKKAIDO_CSV / "hokkaido_station_pairs_ver_25km.csv"
+LATLON_CSV = GNSS_HOKKAIDO_CSV / "stations_latlon.csv"
 
 
 stations_df = pd.read_csv(STATION_LIST)
@@ -34,11 +34,7 @@ def get_station_id(fp: Path) -> str | None:
     Example:
         kin_20240101_0001.csv -> 0001
     """
-    parts = fp.stem.split("_")
-    if len(parts) < 2:
-        return None
-    return parts[-2].upper()
-
+    return fp.stem.split("_")[0][:4]
 
 def load_station_latlon(csv_path: Path) -> dict[str, tuple[float, float]]:
     df = pd.read_csv(csv_path)

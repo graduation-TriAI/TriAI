@@ -1,12 +1,12 @@
 from pathlib import Path
 import pandas as pd
-from shared.paths import GNSS_NOTO_CSV
+from shared.paths import GNSS_HOKKAIDO_CSV
 
-CSV_DIR = GNSS_NOTO_CSV / "enu"
-OUT_CSV = GNSS_NOTO_CSV / "stations_latlon.csv"
+CSV_DIR = GNSS_HOKKAIDO_CSV / "hokkaido_enu_45min"
+OUT_CSV = GNSS_HOKKAIDO_CSV / "stations_latlon.csv"
 
 def get_station_id(fp: Path):
-    return fp.stem.split("_")[-2]
+    return fp.stem.split("_")[0][:4]
 
 def get_latlon_from_csv(fp: Path) -> tuple[float, float] | None:
     try:
