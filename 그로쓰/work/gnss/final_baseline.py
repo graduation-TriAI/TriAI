@@ -12,16 +12,16 @@ from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_KUMAMOTO_PROC, G
 from work.gnss.model_ver2 import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "final_test_noto_2026-05-16"
+EXPERIMENT = "final_test_tohoku_2026-05-16"
 DIST_KM = "25km"
 
 TRAIN_DATA_PATHS = [
-    GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz",
+    GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz",
     GNSS_KUMAMOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"kumamoto_gnss_pgv_dataset_{DIST_KM}_seq.npz",
     GNSS_HOKKAIDO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"hokkaido_gnss_pgv_dataset_{DIST_KM}_seq.npz",
 ]
 
-TARGET_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TARGET_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
 MODEL_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
