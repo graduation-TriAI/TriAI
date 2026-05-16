@@ -6,7 +6,7 @@ from pathlib import Path
 from shared.paths import GNSS_CROSS
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "cross_event_noto_train_tohoku_test_2026-05-06"
+EXPERIMENT = "final_test_hokkaido_2026-05-16"
 DIST_KM = "25km"
 
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
