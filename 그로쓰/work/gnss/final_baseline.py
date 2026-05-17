@@ -7,12 +7,14 @@ import torch.optim as optim
 from pathlib import Path
 import pandas as pd
 from torch.cuda.amp import autocast, GradScaler
+import geopandas as gpd
+from shapely.geometry import Point
 
-from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_KUMAMOTO_PROC, GNSS_HOKKAIDO_PROC, GNSS_CROSS
+from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_KUMAMOTO_PROC, GNSS_HOKKAIDO_PROC, GNSS_CROSS, POST
 from work.gnss.model_ver2 import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "final_test_tohoku_2026-05-16"
+EXPERIMENT = "final_test_tohoku_2026-05-17"
 DIST_KM = "25km"
 
 TRAIN_DATA_PATHS = [
@@ -22,6 +24,8 @@ TRAIN_DATA_PATHS = [
 ]
 
 TARGET_DATA_PATH = GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+
+VS30_SHP_PATH = POST / "vs30 데이터" / "Z-V4-JAPAN-AMP-VS400_M250-SHAPE.shp"
 
 MODEL_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "models" / EXPERIMENT / DIST_KM
 LOG_DIR = GNSS_CROSS / f"{WIN}_{STRIDE}" / "logs" / EXPERIMENT
@@ -42,18 +46,75 @@ DROP_LAST = True
 PATIENCE = 40
 
 class GNSSPGVDataset(Dataset):
-    def __init__(self, npz_path):
-        data = np.load(npz_path)
-        self.X = torch.tensor(data["X"], dtype=torch.float32)  # (N, W, T, 3)
-        self.y = torch.tensor(data["y"], dtype=torch.float32)  # (N,)
-    
+    def __init__(self, npz_path, vs30_shp_path=VS30_SHP_PATH):
+        data = np.load(npz_path, allow_pickle=True)
+
+        self.X = torch.tensor(data["X"], dtype=torch.float32)
+        self.y = torch.tensor(data["y"], dtype=torch.float32)
+
+        print("NPZ keys:", data.files)
+
+        if "lat" in data.files and "lon" in data.files:
+            lats = data["lat"]
+            lons = data["lon"]
+        elif "latitude" in data.files and "longitude" in data.files:
+            lats = data["latitude"]
+            lons = data["longitude"]
+        elif "gnss_lat" in data.files and "gnss_lon" in data.files:
+            lats = data["gnss_lat"]
+            lons = data["gnss_lon"]
+        else:
+            raise KeyError(
+                f"{npz_path} 안에 위도/경도 키가 없음. "
+                f"현재 keys={data.files}. SHP에서 VS30 매칭하려면 lat/lon이 필요함."
+            )
+
+        margin = 0.5
+        bbox = (
+            float(np.min(lons)) - margin,
+            float(np.min(lats)) - margin,
+            float(np.max(lons)) + margin,
+            float(np.max(lats)) + margin,
+        )
+
+        vs30_gdf = gpd.read_file(vs30_shp_path, bbox=bbox).to_crs("EPSG:4326")
+
+        pts_gdf = gpd.GeoDataFrame(
+            {"idx": np.arange(len(lats))},
+            geometry=[Point(float(lo), float(la)) for lo, la in zip(lons, lats)],
+            crs="EPSG:4326"
+        )
+
+        joined = gpd.sjoin(
+            pts_gdf,
+            vs30_gdf[["AVS", "ARV", "geometry"]],
+            how="left",
+            predicate="within"
+        ).sort_values("idx")
+
+        vs30 = joined["ARV"].values
+
+        if np.isnan(vs30).any():
+            fallback = np.nanmedian(vs30)
+            vs30 = np.where(np.isnan(vs30), fallback, vs30)
+
+        vs30 = np.asarray(vs30, dtype=np.float32)
+
+        # 멀티모달처럼 log + z-score
+        log_vs30 = np.log(np.clip(vs30, 1e-3, None))
+        mu = log_vs30.mean()
+        sigma = log_vs30.std()
+        if sigma < 1e-8:
+            sigma = 1.0
+
+        vs30_feat = (log_vs30 - mu) / sigma
+        self.vs30 = torch.tensor(vs30_feat, dtype=torch.float32).unsqueeze(1)
+
     def __len__(self):
         return len(self.X)
-    
+
     def __getitem__(self, idx):
-        x = self.X[idx]
-        y = self.y[idx]
-        return x, y
+        return self.X[idx], self.y[idx], self.vs30[idx]
     
 class NormalizedDataset(Dataset):
     def __init__(self, base_dataset, y_mean, y_std, indices=None):
@@ -67,12 +128,12 @@ class NormalizedDataset(Dataset):
 
     def __getitem__(self, idx):
         real_idx = self.indices[idx]
-        x, y = self.base_dataset[real_idx]
+        x, y, vs30 = self.base_dataset[real_idx]
 
         y_log = torch.log1p(y)
         y_norm = (y_log - self.y_mean) / self.y_std
 
-        return x, y_norm
+        return x, y_norm, vs30
 
 def get_cosine_warmup_scheduler(optimizer, warmup_epochs, total_epochs, min_lr_ratio=0.05):
     def lr_lambda(epoch):
@@ -100,13 +161,14 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
     total_sq_error = 0.0
     total_count = 0
 
-    for X, y in loader:
+    for X, y, vs30 in loader:
         X = X.to(device)
         y = y.to(device).unsqueeze(1)
+        vs30 = vs30.to(device)
 
         optimizer.zero_grad()
 
-        pred = model(X)
+        pred = model(X, vs30)
         loss = criterion(pred, y)
 
         loss.backward()
@@ -132,11 +194,12 @@ def evaluate(model, loader, criterion, device, y_mean=None, y_std=None):
     total_count = 0
 
     with torch.no_grad():
-        for X, y in loader:
+        for X, y, vs30 in loader:
             X = X.to(device)
             y = y.to(device).unsqueeze(1)
+            vs30 = vs30.to(device)
 
-            pred = model(X)
+            pred = model(X, vs30)
             loss = criterion(pred, y)
 
             batch_size = X.size(0)
@@ -170,11 +233,12 @@ def predict(model, loader, device, y_mean, y_std):
     all_pred = []
 
     with torch.no_grad():
-        for X, y in loader:
+        for X, y, vs30 in loader:
             X = X.to(device)
             y = y.to(device).unsqueeze(1)
+            vs30 = vs30.to(device)
 
-            pred = model(X)
+            pred = model(X, vs30)
 
             y_mean_dev = y_mean.to(device)
             y_std_dev = y_std.to(device)

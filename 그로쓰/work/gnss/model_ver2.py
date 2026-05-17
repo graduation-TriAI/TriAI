@@ -8,7 +8,7 @@ class Decoder(nn.Module):
         super().__init__()
         self.attn_pool = nn.Linear(input_dim, 1)
         self.mlp = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
+            nn.Linear(input_dim + 1, hidden_dim),  # vs30 추가
             nn.LayerNorm(hidden_dim),
             nn.ReLU(),
             nn.Dropout(dropout),
@@ -17,9 +17,10 @@ class Decoder(nn.Module):
         )
         self.reg = nn.Linear(hidden_dim // 2, output_dim)
 
-    def forward(self, x):           # (B, T, D)
-        w   = torch.softmax(self.attn_pool(x).squeeze(-1), dim=1).unsqueeze(-1)
-        ctx = (x * w).sum(dim=1)    # (B, D)
+    def forward(self, x, vs30):
+        w = torch.softmax(self.attn_pool(x).squeeze(-1), dim=1).unsqueeze(-1)
+        ctx = (x * w).sum(dim=1)
+        ctx = torch.cat([ctx, vs30], dim=-1)
         return self.reg(self.mlp(ctx))
 	
 class GNSSModel(nn.Module):
@@ -81,7 +82,7 @@ class GNSSModel(nn.Module):
                 dropout=0.3,
             )
 
-    def forward(self, x):
+    def forward(self, x, vs30):
         """
         x: (B, W, T, 3)
         """
@@ -106,6 +107,6 @@ class GNSSModel(nn.Module):
             x = x[:, -1, :]                                # (B, H)
             x = self.final_head(x)                         # (B, 1)
         else:
-            x = self.decoder(x)                            # (B, 1)
+            x = self.decoder(x, vs30)                            # (B, 1)
 
         return x
