@@ -14,16 +14,16 @@ from shared.paths import GNSS_NOTO_PROC, GNSS_TOHOKU_PROC, GNSS_KUMAMOTO_PROC, G
 from work.gnss.model_ver2 import GNSSModel
 from shared.config import WIN, STRIDE
 
-EXPERIMENT = "final_test_hokkaido_2026-05-17"
+EXPERIMENT = "final_test_noto_2026-05-17"
 DIST_KM = "25km"
 
 TRAIN_DATA_PATHS = [
-    GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz",
+    GNSS_HOKKAIDO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"hokkaido_gnss_pgv_dataset_{DIST_KM}_seq.npz",
     GNSS_KUMAMOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"kumamoto_gnss_pgv_dataset_{DIST_KM}_seq.npz",
     GNSS_TOHOKU_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"tohoku_gnss_pgv_dataset_{DIST_KM}_seq.npz",
 ]
 
-TARGET_DATA_PATH = GNSS_HOKKAIDO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"hokkaido_gnss_pgv_dataset_{DIST_KM}_seq.npz"
+TARGET_DATA_PATH = GNSS_NOTO_PROC / f"{WIN}_{STRIDE}" / "1hz" / f"noto_gnss_pgv_dataset_{DIST_KM}_seq.npz"
 
 VS30_SHP_PATH = POST / "vs30 데이터" / "Z-V4-JAPAN-AMP-VS400_M250-SHAPE.shp"
 
