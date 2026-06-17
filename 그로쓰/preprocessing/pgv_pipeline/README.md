@@ -15,3 +15,23 @@
 
 3. PGV 매칭
 	- 관측소명 및 위치 정보를 기반으로 PGV 값을 Hi-net 관측소에 매칭 (`PGV 매칭.py`)
+
+---
+
+### 디렉토리 구조
+
+```markdown
+.
+├── README.md
+├── seismic.ipynb
+├── gnss/
+│   ├── build_gnss_pgv_dataset_seq.py
+│   ├── encoder_ver2.py
+│   ├── final_baseline.py
+│   ├── model_ver2.py
+│   ├── plot_logs.py
+│   └── plot_test_scatter.py
+├── multimodal.ipynb
+└── postprocessing.ipynb
+
+```

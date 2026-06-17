@@ -6,14 +6,32 @@
 
 ### 디렉토리 구조
 
-- `final`
-	최종 멀티모달 학습 코드 및 최종 후처리 코드
+```markdown
+.
+├── README.md
+├── gnss/
+│   ├── README.md
+│   ├── __init__.py
+│   ├── baseline_ver2.py
+│   ├── baseline_weighted_mse.py
+│   ├── baseline.py
+│   ├── build_gnss_pgv_dataset_seq.py
+│   ├── encoder_ver2.py
+│   ├── encoder.py
+│   ├── export_metric_npy.py
+│   ├── final_baseline.py
+│   ├── inspect_npz.py
+│   ├── log_export_ver.py
+│   ├── model_ver2.py
+│   ├── model.py
+│   ├── plot_logs.py
+│   └── plot_test_scatter.py
+├── seismic/
+│   ├── README.md
+│   ├── seismic_model_ver1.ipynb
+│   └── seismic_model_ver2.ipynb
+└── multimodal/
+	├── README.md
+    └── multimodal model.ipynb
 
-- `gnss`
-	GNSS 데이터 기반 단일 모달 모델 및 학습 코드
-
-- `seismic`
-	지진파형 데이터 기반 단일 모달 모델 및 학습 코드
-
-- `multimodal`
-	GNSS와 지진파형을 결합한 멀티모달 모델 및 학습 코드
+```
