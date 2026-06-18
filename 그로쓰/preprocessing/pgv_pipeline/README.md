@@ -23,15 +23,9 @@
 ```markdown
 .
 ├── README.md
-├── seismic.ipynb
-├── gnss/
-│   ├── build_gnss_pgv_dataset_seq.py
-│   ├── encoder_ver2.py
-│   ├── final_baseline.py
-│   ├── model_ver2.py
-│   ├── plot_logs.py
-│   └── plot_test_scatter.py
-├── multimodal.ipynb
-└── postprocessing.ipynb
+├── compute_distance_to_tohoku.py
+├── extract_station_latlon.py
+├── PGV 매칭.py
+└── PGV 정리.py
 
 ```

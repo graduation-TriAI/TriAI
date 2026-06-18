@@ -39,9 +39,10 @@
 	- [실험 3] 학습: 대지진 1, 대지진 3, 대지진 4 / 검증 및 테스트: 대지진 2
 	- [실험 4] 학습: 대지진 2, 대지진 3, 대지진 4 / 검증 및 테스트: 대지진 1
 
-- 평가 방식
+- 목표
 	- 각 실험에서 테스트 데이터의 **PGV 예측 성능을 평가**
-	- 4개 Fold의 결과를 종합해 **모델의 일반화 성능**을 분석
+    - 예측 PGV 값을 기반으로 한 **ShakeMap 형태의 위험지도 생성**
+	- 단일 모달리티 기반 모델과 제안 멀티모달 모델의 성능을 비교하여 **멀티모달 접근 방식의 효과 검증**
 
 ### 데이터셋
 
@@ -114,8 +115,9 @@
 		│   ├── README.md
 		│   ├── seismic_pipeline/
 		│   │   ├── README.md
+		│   │   ├── hinet.py
 		│   │   ├── hinet_slicing.py
-		│   │   └── hinet.py
+		│   │   └── 지진파형_구조_변형.ipynb
 		│   ├── gnss_pipeline/
 		│   │   ├── README.md
 		│   │   ├── hokkaido_pipeline/
@@ -180,6 +182,12 @@
 		│   └── multimodal/
 		│   	├── README.md
 		│       └── multimodal model.ipynb
+		├── postprocessing/
+		│   ├── README.md
+		│   ├── kriging/
+		│   │   ├── make_kriging_input.py
+		│   │   └── run_kriging.py
+		│   └── shakemap.ipynb
         ├── final/
 		│   ├── README.md
 		│   ├── seismic.ipynb
@@ -198,7 +206,7 @@
 		│   └── 26-TriAI-포스터 파일-조혜림.pdf
 		├── shared/
 		└── .gitignore 
-            
+		    
 ```
 
 ---

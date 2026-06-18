@@ -9,18 +9,17 @@
 1. 지진파형 데이터 변환 및 통합
 	- Hi-net 원시 `.cnt` 파일을 SAC 형식으로 변환 (`hinet.py`)
 	- 다수의 SAC 파일을 하나의 연속적인 mseed 파일로 병합
-
-2. 유효 관측소 선택 및 매칭
-	- PGV 라벨이 존재하는 관측소 선택
-	- mseed 데이터의 관측소와 이름 기반 매칭 (`pgv_to_mseed`)
 	
-3. 시계열 데이터 슬라이싱
+2. 유효 관측소 선택 및 매칭 후 시계열 데이터 슬라이싱
+	- mseed 데이터의 관측소와 이름 기반 매칭을 통해 PGV 라벨이 존재하는 관측소 선택
 	- 3채널(E/N/Z) 지진파형을 일정 길이 윈도우로 분할
 	- 각 윈도우에 대해 Z-score 정규화 수행 (`hinet_slicing.py`)
 	
-4. 학습용 데이터셋 생성
+3. 학습용 데이터셋 생성
 	- 슬라이싱된 시계열 데이터를 하나로 결합하여 `.npz` 형태로 저장
 	- 관측소 이름 및 윈도우 시작 시각 정보 포함
+
+4. 
 
 ---
 
@@ -29,15 +28,8 @@
 ```markdown
 .
 ├── README.md
-├── seismic.ipynb
-├── gnss/
-│   ├── build_gnss_pgv_dataset_seq.py
-│   ├── encoder_ver2.py
-│   ├── final_baseline.py
-│   ├── model_ver2.py
-│   ├── plot_logs.py
-│   └── plot_test_scatter.py
-├── multimodal.ipynb
-└── postprocessing.ipynb
+├── hinet.py
+├── hinet_slicing.py
+└── 지진파형_구조_변형.ipynb
 
 ```

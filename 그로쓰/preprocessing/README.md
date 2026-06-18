@@ -27,10 +27,8 @@
 5. PGV 라벨 매칭 및 정체
 	- 관측소별 PGV 값 생성 및 필터링
 
-6. 모델 입력용 데이터셋 생성
+6. 멀티모달 모델 입력용 데이터셋 생성
 	- `.npz` 형태로 최종 학습 데이터 구성
-
-7. 
 
 ---
 
@@ -41,8 +39,9 @@
 ├── README.md
 ├── seismic_pipeline/
 │   ├── README.md
+│   ├── hinet.py
 │   ├── hinet_slicing.py
-│   └── hinet.py
+│   └── 지진파형_구조_변형.ipynb
 ├── gnss_pipeline/
 │   ├── README.md
 │   ├── hokkaido_pipeline/

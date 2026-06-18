@@ -66,6 +66,32 @@
 
 ---
 
+### How to Build
+
+별도의 Build 과정은 필요하지 않습니다.
+
+필요한 Python 패키지를 설치한 후 각 스크립트를 순차적으로 실행하여 데이터셋을 구축할 수 있습니다.
+
+### How to Install
+
+필요한 패키지를 설치합니다.
+
+```bash
+pip install numpy pandas scipy matplotlib 
+```
+
+### How to Test
+
+각 지진 이벤트별 파이프라인을 실행하여 데이터 전처리를 수행합니다.
+
+예시:
+
+```bash
+python -m preprocessing.gnss_pipeline.hokkaido_pipeline.gnss_ecef_to_enu
+```
+
+---
+
 ### 디렉토리 구조
 
 ```markdown
