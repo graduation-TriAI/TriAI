@@ -14,6 +14,9 @@
     - Vs30 데이터로 지반 증폭 보정 후 디코더 기반 PGV 회귀 예측
     - 로그 스케일링을 적용한 PGV 예측 및 RMSE 평가
 
+- How to build, install, test
+    - 해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+
 ---
 
 ### GNSS 모델
@@ -86,6 +89,9 @@ GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검
     - Vs30 데이터로 지반 증폭 보정 후 디코더 기반 PGV 회귀 예측
     - 로그 스케일링을 적용한 PGV 예측 및 RMSE 평가
 
+- How to build, install, test
+    - 해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+
 ---
 
 ### 후처리
@@ -95,6 +101,9 @@ GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검
 - 주요 단계
     - 크리깅
     - ShakeMap 생성
+
+- How to build, install, test
+    - 해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
 
 ---
 

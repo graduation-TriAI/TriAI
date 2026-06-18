@@ -153,18 +153,62 @@
 
 ## 실험 방법
 
+### 데이터 다운로드
 
+1. 지진파형 데이터
+	- 하단 링크에 로그인 후 접속 승인 요청
+	- 승인 후 'F-net Station selection is here'에서 지진마다 해당하는 관측소를 선택해서 다운로드
+	링크: https://hinetwww11.bosai.go.jp/auth/?LANG=en
+
+2. GNSS 데이터
+	- 도호쿠 지진: 하단 링크에서 다운로드
+	링크: https://doi.pangaea.de/10.1594/PANGAEA.914110
+
+	- 쿠마모토, 홋카이도 지진: 하단 링크의 이메일 주소로 데이터 요청
+	링크: https://www.gsi.go.jp/ENGLISH/geonet_technical_report.html
+
+	- 노토 지진: 하단 링크에서 다운로드
+	링크: https://research-opendata.gsi.go.jp/tech_data/2025-017-C/2025-017-C-lp.html?utm_source=chatgpt.com
+
+3. PGV 데이터
+	- 도호쿠 지진: 하단 링크에서 Station List 다운로드
+	링크: https://earthquake.usgs.gov/earthquakes/eventpage/official20110311054624120_30/shakemap/pgv
+
+	- 쿠마모토 지진: 하단 링크에서 Station List 다운로드
+	링크: https://earthquake.usgs.gov/earthquakes/eventpage/us20005iis/shakemap/pgv
+
+	- 홋카이도 지진: 하단 링크에서 Station List 다운로드
+	링크: https://earthquake.usgs.gov/earthquakes/eventpage/us2000h8ty/shakemap/pgv
+
+	- 노토 지진: 하단 링크에서 Station List 다운로드
+	링크: https://earthquake.usgs.gov/earthquakes/eventpage/us6000m0xl/shakemap/pgv
+
+### 코드 실행
+
+1. 데이터 전처리
+	- 지진파형 데이터: `preprocessing/seismic_pipeline/` 내의 코드 실행
+	- GNSS 데이터: `preprocessing/gnss_pipeline/` 내의 코드와 `station_pairs.ipynb` 실행
+	- PGV 데이터: `preprocessing/pgv_pipeline/` 내의 코드 실행
+	- 멀티모달 데이터셋 구축: `preprocessing/multimodal_pipeline/` 내의 코드 실행
+
+2. 모델 학습 및 검증
+	- 지진파형 모델: `final/seismic.ipynb` 코드 실행
+	- GNSS 모델: `final/gnss/` 내의 코드 실행
+	- 멀티모달 모델: `final/multimodal.ipynb` 코드 실행
+
+3. 후처리 및 위험지도 생성
+	- `final/postprocessing.ipynb` 코드 실행
 
 ## 실험 결과
 
 ### 모델별 성능
 
-|  | Seismic-only | GNSS-only | Proposed |
+|  | Seismic-only | GNSS-only | **Proposed** |
 | --- | --- | --- | --- |
-| 노토 테스트 실험 Test RMSE | 10.96 | 21.38 | 9.92 |
-| 홋카이도 테스트 실험 Test RMSE | 8.25 | 8.93 | 7.80 |
-| 쿠마모토 테스트 실험 Test RMSE | 4.52 | 14.05 | 3.47 |
-| 도호쿠 테스트 실험 Test RMSE | 12.27 | 8.76 | 14.05 |
+| 노토 테스트 실험 Test RMSE | 10.96 | 21.38 | **9.92** |
+| 홋카이도 테스트 실험 Test RMSE | 8.25 | 8.93 | **7.80** |
+| 쿠마모토 테스트 실험 Test RMSE | 4.52 | 14.05 | **3.47** |
+| 도호쿠 테스트 실험 Test RMSE | 12.27 | **8.76** | 14.05 |
 
 ### ShakeMap 위험지도
 

@@ -18,6 +18,12 @@
 
 ---
 
+### How to build, install, test
+
+해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+
+---
+
 ### 디렉토리 구조
 
 ```markdown
