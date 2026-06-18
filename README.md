@@ -33,7 +33,7 @@
 
 ### 수행 과제
 
-- 대지진 4종류에 대해 **LOOCV(Leave-One-Out Cross Validation)**을 활용하여 **PGV 추정**
+- 대지진 4종류에 대해 **LOOCV**(Leave-One-Out Cross Validation)을 활용하여 **PGV 추정**
 	- [실험 1] 학습: 대지진 1, 대지진 2, 대지진 3 / 검증 및 테스트: 대지진 4
 	- [실험 2] 학습: 대지진 1, 대지진 2, 대지진 4 / 검증 및 테스트: 대지진 3
 	- [실험 3] 학습: 대지진 1, 대지진 3, 대지진 4 / 검증 및 테스트: 대지진 2
@@ -77,7 +77,7 @@
 
 ### 실험 환경
 
-- Google Colab GPU
+- Google Colab L4 GPU
 
 ## 디렉토리 구조
 
