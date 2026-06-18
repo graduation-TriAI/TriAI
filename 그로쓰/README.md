@@ -48,7 +48,7 @@
 
 ### 실험 환경
 
-- Google Colab GPU
+- Google Colab L4 GPU
 
 ## 디렉토리 구조
 
@@ -158,38 +158,30 @@
 1. 지진파형 데이터
 	- 하단 링크에 로그인 후 접속 승인 요청
 	- 승인 후 'F-net Station selection is here'에서 지진마다 해당하는 관측소를 선택해서 다운로드
-	<br>
-	링크: https://hinetwww11.bosai.go.jp/auth/?LANG=en
+	<br>링크: https://hinetwww11.bosai.go.jp/auth/?LANG=en
 
 2. GNSS 데이터
 	- 도호쿠 지진: 하단 링크에서 다운로드
-	<br>
-	링크: https://doi.pangaea.de/10.1594/PANGAEA.914110
+	<br>링크: https://doi.pangaea.de/10.1594/PANGAEA.914110
 
 	- 쿠마모토, 홋카이도 지진: 하단 링크의 이메일 주소로 데이터 요청
-	<br>
-	링크: https://www.gsi.go.jp/ENGLISH/geonet_technical_report.html
+	<br>링크: https://www.gsi.go.jp/ENGLISH/geonet_technical_report.html
 
 	- 노토 지진: 하단 링크에서 다운로드
-	<br>
-	링크: https://research-opendata.gsi.go.jp/tech_data/2025-017-C/2025-017-C-lp.html?utm_source=chatgpt.com
+	<br>링크: https://research-opendata.gsi.go.jp/tech_data/2025-017-C/2025-017-C-lp.html?utm_source=chatgpt.com
 
 3. PGV 데이터
 	- 도호쿠 지진: 하단 링크에서 Station List 다운로드
-	<br>
-	링크: https://earthquake.usgs.gov/earthquakes/eventpage/official20110311054624120_30/shakemap/pgv
+	<br>링크: https://earthquake.usgs.gov/earthquakes/eventpage/official20110311054624120_30/shakemap/pgv
 
 	- 쿠마모토 지진: 하단 링크에서 Station List 다운로드
-	<br>
-	링크: https://earthquake.usgs.gov/earthquakes/eventpage/us20005iis/shakemap/pgv
+	<br>링크: https://earthquake.usgs.gov/earthquakes/eventpage/us20005iis/shakemap/pgv
 
 	- 홋카이도 지진: 하단 링크에서 Station List 다운로드
-	<br>
-	링크: https://earthquake.usgs.gov/earthquakes/eventpage/us2000h8ty/shakemap/pgv
+	<br>링크: https://earthquake.usgs.gov/earthquakes/eventpage/us2000h8ty/shakemap/pgv
 
 	- 노토 지진: 하단 링크에서 Station List 다운로드
-	<br>
-	링크: https://earthquake.usgs.gov/earthquakes/eventpage/us6000m0xl/shakemap/pgv
+	<br>링크: https://earthquake.usgs.gov/earthquakes/eventpage/us6000m0xl/shakemap/pgv
 
 ### 코드 실행
 
