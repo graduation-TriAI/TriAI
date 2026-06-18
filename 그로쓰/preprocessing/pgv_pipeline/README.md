@@ -15,3 +15,23 @@
 
 3. PGV 매칭
 	- 관측소명 및 위치 정보를 기반으로 PGV 값을 Hi-net 관측소에 매칭 (`PGV 매칭.py`)
+
+---
+
+### How to build, install, test
+
+해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+
+---
+
+### 디렉토리 구조
+
+```markdown
+.
+├── README.md
+├── compute_distance_to_tohoku.py
+├── extract_station_latlon.py
+├── PGV 매칭.py
+└── PGV 정리.py
+
+```
