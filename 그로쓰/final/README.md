@@ -6,7 +6,7 @@
 
 ### 지진파형 모델
 
-지진파형 데이터를 입력받아 PGV를 예측하는 지진파형 모델의 학습 및 검증 코드 (seismic.ipynb)
+지진파형 데이터를 입력받아 PGV를 예측하는 지진파형 모델의 학습 및 검증 코드 (`seismic.ipynb`)
 
 - 주요 단계
     - 지진파형 데이터셋 로드 및 전처리
@@ -18,7 +18,7 @@
 
 ### GNSS 모델
 
-GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검증 코드 (gnss/)
+GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검증 코드 (`gnss/`)
 
 - 코드 설명
 
@@ -77,7 +77,7 @@ GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검
 
 ### 멀티모달 모델
 
-지진파형 및 GNSS 데이터를 입력받아 UMIS(Universal Modality-Independent Space) 레이어로 투영하고, 이를 바탕으로 PGV를 예측하는 멀티모달 모델의 학습 및 검증 코드 (multimodal.ipynb)
+지진파형 및 GNSS 데이터를 입력받아 UMIS(Universal Modality-Independent Space) 레이어로 투영하고, 이를 바탕으로 PGV를 예측하는 멀티모달 모델의 학습 및 검증 코드 (`multimodal.ipynb`)
 
 - 주요 단계
     - 지진파형/ GNSS 데이터셋 동시 로드 및 전처리
@@ -90,7 +90,7 @@ GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검
 
 ### 후처리
 
-예측된 PGV 값을 후처리하는 과정을 통합한 코드 (postprocessing.ipynb)
+예측된 PGV 값을 후처리하는 과정을 통합한 코드 (`postprocessing.ipynb`)
 
 - 주요 단계
     - 크리깅

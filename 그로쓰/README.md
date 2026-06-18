@@ -154,7 +154,10 @@
 ## 실험 방법
 
 
+
 ## 실험 결과
+
+### 모델별 성능
 
 |  | Seismic-only | GNSS-only | Proposed |
 | --- | --- | --- | --- |
@@ -162,3 +165,7 @@
 | 홋카이도 테스트 실험 Test RMSE | 8.25 | 8.93 | 7.80 |
 | 쿠마모토 테스트 실험 Test RMSE | 4.52 | 14.05 | 3.47 |
 | 도호쿠 테스트 실험 Test RMSE | 12.27 | 8.76 | 14.05 |
+
+### ShakeMap 위험지도
+
+<img width="1295" height="689" alt="Image" src="https://github.com/user-attachments/assets/7829a16f-f30f-4491-8612-f40e2bf71783" />
