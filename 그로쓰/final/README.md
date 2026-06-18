@@ -15,7 +15,7 @@
     - 로그 스케일링을 적용한 PGV 예측 및 RMSE 평가
 
 - How to build, install, test
-    - 해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+    - 해당 코드를 다운받아 Google Colab L4 GPU 환경에서 실행합니다.
 
 ---
 
@@ -90,7 +90,7 @@ GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검
     - 로그 스케일링을 적용한 PGV 예측 및 RMSE 평가
 
 - How to build, install, test
-    - 해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+    - 해당 코드를 다운받아 Google Colab L4 GPU 환경에서 실행합니다.
 
 ---
 
@@ -103,7 +103,7 @@ GNSS 데이터를 입력받아 PGV를 예측하는 GNSS 모델의 학습 및 검
     - ShakeMap 생성
 
 - How to build, install, test
-    - 해당 코드를 다운받아 Google Colab GPU 환경에서 실행합니다.
+    - 해당 코드를 다운받아 Google Colab 환경에서 실행합니다.
 
 ---
 
